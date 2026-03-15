@@ -8,7 +8,7 @@ import {
 // ================== PAGES ==================
 import Home from "./pages/Home/Home";
 import Dashboard from "./pages/Dashboard/Dashboard";
-import Comparison from "./pages/Comparison/Comparison";
+import Comparison from "./pages/comparison/Comparison";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
 import RoutePage from "./pages/RoutePage";
