@@ -55,7 +55,7 @@ function formatDuration(seconds) {
 /* ===================== Backend ORS Fetch ===================== */
 const fetchRoutes = async (origin, destination, profile) => {
   try {
-    const response = await axios.post("http://localhost:5000/api/external/ors-route", {
+    const response = await axios.post(`${API_BASE_URL}/api/external/ors-route`, {
       origin,
       destination,
       profile,
