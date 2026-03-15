@@ -2,17 +2,19 @@
 /* ===== DARK MODE COLORS ===== */
 .dark body {
   background-color: #022c22;
+  color: #f1f5f9;
 }
 
 .dark h1,
 .dark h2,
 .dark h3 {
-  color: #86efac;
+  color: #a7f3d0;
 }
 
 .dark p {
   color: #d1fae5;
 }
+
 /* ===== GREENPATH MAP GLOW ===== */
 @keyframes glow {
   0% {
@@ -28,4 +30,55 @@
 
 .map-glow {
   animation: glow 2.5s infinite;
+}
+
+/* ===== ANIMATED BLOBS ===== */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 8s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* ===== FIX: HIDE GOOGLE MAPS DEV/BILLING ERROR OVERLAYS ===== */
+.gm-err-container,
+.gm-err-content,
+.gm-err-title,
+.gm-style-cc {
+  display: none !important;
+}
+.dismissButton {
+  display: none !important;
+}
+/* Specifically remove only the grey overlay that has 0.4 opacity */
+.gm-style div[style*="background-color: rgba(0, 0, 0, 0.4)"] {
+  display: none !important;
+}
+.gm-style div[style*="background-color: rgba(0, 0, 0, 0.6)"] {
+  display: none !important;
+}
+
+/* ===== GLASSMORPHISM ===== */
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.dark .glassmorphism {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }

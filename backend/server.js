@@ -25,6 +25,7 @@ const leaderboardRoutes = require("./routes/leaderboard");
 
 // ✅ NEW: AQI proxy route
 const aqiRoutes = require("./routes/aqi");
+const safetyRoutes = require("./routes/safety");
 
 // ✅ MongoDB Connect
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/greenways";
@@ -61,6 +62,7 @@ app.use("/api/leaderboard", leaderboardRoutes);
 
 // ✅ NEW: AQI proxy mount
 app.use("/api/aqi", aqiRoutes);
+app.use("/api/safety", safetyRoutes);
 
 // ✅ Health Check Route
 app.get("/api/health", (req, res) =>

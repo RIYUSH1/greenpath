@@ -1,5 +1,6 @@
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../api/config";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -46,7 +47,7 @@ export default function MapPreview({ place }) {
 
     console.log("📍 Fetching heatmap for:", place);
 
-    fetch("http://127.0.0.1:5000/api/night-safety-heatmap", {
+    fetch(`${API_BASE_URL}/api/night-safety-heatmap`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ place, time: 22 }),

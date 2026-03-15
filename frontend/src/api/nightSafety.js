@@ -1,6 +1,7 @@
 import axios from "axios";
+import { API_BASE_URL } from "./config";
 
-const API_URL = "http://127.0.0.1:5000/api/night-safety";
+const API_URL = `${API_BASE_URL}/api/night-safety`;
 
 export const fetchNightSafety = async ({ place, lat, lng }) => {
   const response = await axios.post(API_URL, {

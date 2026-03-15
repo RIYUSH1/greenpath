@@ -1,11 +1,17 @@
-// Comparison.jsx
+
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Bar, Radar, Line } from "react-chartjs-2";
 import "chart.js/auto";
 import axios from "axios";
-import { FaTrophy, FaLeaf, FaChartBar, FaUser, FaWind, FaLeaf as LeafIcon } from "react-icons/fa";
+import { FaTrophy, FaLeaf, FaChartBar, FaUser, FaWind, FaMapMarkedAlt, FaLeaf as LeafIcon } from "react-icons/fa";
 import fetchAQIProxy from "../../utils/fetchAQI_via_proxy";
+import EcoPreferenceSelector from "../../components/EcoPreferenceSelector";
+import { getEcoPreferences } from "../../utils/ecoPreferences";
+import RouteMap from "../../components/RouteMap";
+import { API_BASE_URL } from "../../api/config";
+
+
 
 
 /**
@@ -97,63 +103,73 @@ const aqiLabel = (v) => {
 /**
  * StatCard — small reusable card to show a stat
  */
+/**
+ * StatCard — small reusable card to show a stat
+ */
 function StatCard({ title, value, sub, icon }) {
   return (
-    <div className="p-4 bg-white/6 rounded-lg border border-white/10">
-      <div className="flex items-center gap-3">
-        <div className="text-2xl">{icon}</div>
+    <div className="p-4 bg-white/5 backdrop-blur-2xl rounded-2xl border border-white/10 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0_15px_35px_rgba(0,0,0,0.35)] transition-all duration-300 group">
+      <div className="flex items-center gap-4">
+        <div className="text-3xl text-gray-300 group-hover:text-cyan-400 group-hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] transition-all duration-300 group-hover:scale-110">{icon}</div>
         <div>
-          <div className="text-sm text-gray-300">{title}</div>
-          <div className="text-lg font-semibold">{value}</div>
-          {sub && <div className="text-xs text-gray-400">{sub}</div>}
+          <div className="text-sm text-gray-400 font-medium group-hover:text-gray-200 transition-colors uppercase tracking-wide">{title}</div>
+          <div className="text-xl font-bold text-white tracking-tight">{value}</div>
+          {sub && <div className="text-xs text-gray-500 mt-1">{sub}</div>}
         </div>
       </div>
     </div>
   );
 }
 
-/**
- * AQICard — shows AQI numeric, label, components and a tip
- */
 function AQICard({ place, aqiData /* { aqi, components, lat, lon } */ }) {
   const numeric = aqiData?.aqi ?? null;
   const components = aqiData?.components ?? null;
   const lbl = aqiLabel(numeric);
 
   return (
-    <div className={`p-4 rounded-lg border ${lbl.bg} border-white/10`}>
-      <div className="flex items-center justify-between mb-3">
+    <div className={`p-6 rounded-xl border ${lbl.bg} border-white/10 hover:shadow-[0_15px_30px_rgba(0,0,0,0.3)] transition-all duration-300`}>
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <div className="text-sm text-gray-300">{place}</div>
-          <div className="text-xl font-bold">{numeric ? `AQI ${numeric} — ${lbl.label}` : "AQI — N/A"}</div>
+          <div className="text-sm text-gray-300 uppercase tracking-wide font-medium">{place}</div>
+          <div className="text-2xl font-bold mt-1 text-white">{numeric ? `AQI ${numeric} — ${lbl.label}` : "AQI — N/A"}</div>
         </div>
-        <div className={`text-3xl ${lbl.color}`}>{numeric ? (numeric <= 2 ? "😊" : numeric === 3 ? "😐" : "😷") : "—"}</div>
+        <div className={`text-4xl drop-shadow-lg ${lbl.color}`}>{numeric ? (numeric <= 2 ? "😊" : numeric === 3 ? "😐" : "😷") : "—"}</div>
       </div>
 
+      <div className="w-full h-px bg-white/10 my-4"></div>
+
       {components ? (
-        <div className="text-sm mb-3">
-          <div>PM2.5: {components.pm2_5 ?? "—"} µg/m³</div>
-          <div>PM10: {components.pm10 ?? "—"} µg/m³</div>
-          <div>NO₂: {components.no2 ?? "—"} µg/m³</div>
+        <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+          <div className="bg-black/20 p-2 rounded-lg">
+             <span className="text-gray-400 block text-xs">PM2.5</span>
+             <span className="font-medium text-white">{components.pm2_5 ?? "—"} µg/m³</span>
+          </div>
+          <div className="bg-black/20 p-2 rounded-lg">
+             <span className="text-gray-400 block text-xs">PM10</span>
+             <span className="font-medium text-white">{components.pm10 ?? "—"} µg/m³</span>
+          </div>
+          <div className="bg-black/20 p-2 rounded-lg">
+             <span className="text-gray-400 block text-xs">NO₂</span>
+             <span className="font-medium text-white">{components.no2 ?? "—"} µg/m³</span>
+          </div>
         </div>
       ) : (
-        <div className="text-sm text-gray-400 mb-3">Components not available</div>
+        <div className="text-sm text-gray-400 mb-4 bg-black/20 p-3 rounded-lg flex items-center justify-center">Components data unavailable</div>
       )}
 
-      <div className="text-xs text-gray-200 mb-2">{lbl.tip}</div>
+      <div className="text-sm text-gray-200 mb-4 bg-white/5 p-3 rounded-lg border border-white/5 leading-relaxed">
+         <span className="font-semibold text-white">Insight:</span> {lbl.tip}
+      </div>
 
       <div>
         <button
-          className="px-3 py-1 rounded bg-white/6 text-sm hover:bg-white/8"
+          className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm hover:bg-white/10 hover:-translate-y-0.5 transition-all duration-300 font-medium"
           onClick={() => {
-            // copy quick summary to clipboard
             const summary = `${place} — ${numeric ? `AQI ${numeric} (${lbl.label})` : "AQI N/A"}`;
-            navigator.clipboard?.writeText(summary).then(() => {
-              // user feedback could be added; keep simple
-            });
+            navigator.clipboard?.writeText(summary);
           }}
         >
-          Copy summary
+          Copy Air Quality Data
         </button>
       </div>
     </div>
@@ -173,6 +189,8 @@ export default function Comparison() {
   const [mapError, setMapError] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [username, setUsername] = useState(() => localStorage.getItem("ecoUserName") || "Riyush Kumar");
+  const [ecoPrefs, setEcoPrefs] = useState(getEcoPreferences());
+
 
   // store full AQI objects returned by proxy
   const [aqiOrigin, setAqiOrigin] = useState(null); // { aqi, components, lat, lon }
@@ -195,7 +213,7 @@ export default function Comparison() {
   /* ===================== Fetch Leaderboard ===================== */
   const fetchLeaderboard = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/leaderboard");
+      const res = await axios.get(`${API_BASE_URL}/api/leaderboard`);
       // backend may return array or { data: [] } depending on implementation
       setLeaderboard(Array.isArray(res.data) ? res.data : res.data?.data || []);
     } catch (err) {
@@ -419,7 +437,7 @@ export default function Comparison() {
       const userId = localStorage.getItem("userId");
       if (userId && co2_saved >= 0.01) {
         try {
-          await axios.post("http://localhost:5000/api/leaderboard/update", {
+          await axios.post(`${API_BASE_URL}/api/leaderboard/update`, {
             userId,
             co2Saved: co2_saved,
           });
@@ -520,15 +538,27 @@ export default function Comparison() {
 
   /* ===================== Render ===================== */
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 text-white p-8">
-      <motion.div className="max-w-7xl mx-auto" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+    <div 
+      className="min-h-screen text-white p-6 md:p-10 relative overflow-hidden font-sans"
+      style={{
+        background: 'linear-gradient(135deg, #0f172a, #111827, #1e293b, #020617)',
+      }}
+    >
+      {/* Subtle radial highlight */}
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] pointer-events-none" style={{ background: 'radial-gradient(circle at top right, rgba(56,189,248,0.15), transparent 70%)' }}></div>
+
+      <motion.div className="max-w-7xl mx-auto relative z-10" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}>
         {/* Header */}
-        <div className="flex items-center justify-between mb-10">
-          <div>
-            <h1 className="text-4xl font-bold flex items-center gap-3">
-              <FaChartBar className="text-green-400" /> Route & Eco Comparison
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
+          <div className="group cursor-pointer">
+            <h1 className="text-4xl md:text-5xl font-extrabold flex items-center gap-4 tracking-tight relative">
+              <FaChartBar className="text-cyan-400 group-hover:rotate-12 transition-transform duration-300 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" /> 
+              <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-sky-400 text-transparent bg-clip-text relative inline-block">
+                Route & Eco Comparison
+                <span className="absolute -bottom-2 left-0 w-0 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-500 rounded-full"></span>
+              </span>
             </h1>
-            <p className="text-gray-300 mt-2">Compare two routes, see CO₂ & live Google satellite + traffic — plus AQI at origin & destination.</p>
+            <p className="text-gray-400/80 mt-4 text-lg font-light">Compare two routes, see CO₂, live satellite + traffic, and AQI seamlessly.</p>
           </div>
 
           {/* small username control */}
@@ -545,20 +575,29 @@ export default function Comparison() {
             />
           </div>
         </div>
+        <EcoPreferenceSelector onChange={setEcoPrefs} />
+
 
         {/* Input Section */}
-        <div className="bg-white/10 p-6 rounded-2xl shadow-lg mb-8">
-          <div className="grid md:grid-cols-4 gap-3 mb-4">
-            <input value={origin} onChange={(e) => setOrigin(e.target.value)} placeholder="Origin (city or place)" className="p-3 rounded-lg bg-purple-800/40 border border-purple-500/40" />
-            <input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Destination (city or place)" className="p-3 rounded-lg bg-purple-800/40 border border-purple-500/40" />
-            <select value={modeA} onChange={(e) => setModeA(e.target.value)} className="p-3 rounded-lg bg-purple-800/40 border border-purple-500/40">
+        <div 
+          className="p-8 rounded-[18px] shadow-[0_10px_30px_rgba(0,0,0,0.3)] mb-10 border border-white/10"
+          style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)' }}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="relative group/input">
+              <input value={origin} onChange={(e) => setOrigin(e.target.value)} placeholder="Origin (city or place)" className="w-full p-4 rounded-xl bg-[#0f172a]/50 border border-white/5 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none text-white placeholder-gray-500 transition-all duration-300" />
+            </div>
+            <div className="relative group/input">
+              <input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Destination (city or place)" className="w-full p-4 rounded-xl bg-[#0f172a]/50 border border-white/5 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none text-white placeholder-gray-500 transition-all duration-300" />
+            </div>
+            <select value={modeA} onChange={(e) => setModeA(e.target.value)} className="w-full p-4 rounded-xl bg-[#0f172a]/50 border border-white/5 focus:border-purple-400/50 focus:ring-2 focus:ring-purple-400/20 focus:outline-none text-white transition-all duration-300 appearance-none">
               <option value="car">Car</option>
               <option value="bus">Bus</option>
               <option value="train">Train</option>
               <option value="bicycle">Bicycle</option>
               <option value="walking">Walking</option>
             </select>
-            <select value={modeB} onChange={(e) => setModeB(e.target.value)} className="p-3 rounded-lg bg-purple-800/40 border border-purple-500/40">
+            <select value={modeB} onChange={(e) => setModeB(e.target.value)} className="w-full p-4 rounded-xl bg-[#0f172a]/50 border border-white/5 focus:border-purple-400/50 focus:ring-2 focus:ring-purple-400/20 focus:outline-none text-white transition-all duration-300 appearance-none">
               <option value="car">Car</option>
               <option value="bus">Bus</option>
               <option value="train">Train</option>
@@ -567,21 +606,23 @@ export default function Comparison() {
             </select>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button disabled={loading} onClick={compare} className="px-5 py-3 bg-green-500 rounded-lg font-semibold hover:bg-green-400 transition disabled:opacity-60">
-              {loading ? "Comparing..." : "Compare Routes"}
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <button 
+              disabled={loading} 
+              onClick={compare} 
+              className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-white shadow-[0_0_15px_rgba(6,182,212,0.4)] hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
+            >
+              {loading ? "Comparing Routes..." : "Compare Routes"}
             </button>
-
             <button
               onClick={() => {
-                // swap origin/destination
                 const o = origin;
                 setOrigin(destination);
                 setDestination(o);
               }}
-              className="px-4 py-2 bg-white/6 rounded hover:bg-white/8"
+              className="w-full sm:w-auto px-6 py-3.5 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 hover:scale-105 transition-all duration-300 font-medium"
             >
-              Swap
+              Swap Points
             </button>
 
             <div className="ml-auto flex items-center gap-3">
@@ -600,65 +641,105 @@ export default function Comparison() {
         </div>
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
-          <motion.div className="bg-white/10 p-6 rounded-2xl shadow-xl border border-white/20">
-            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-              <FaLeaf className="text-green-400" /> Transport Emission Comparison
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+          <motion.div 
+            className="group p-6 rounded-2xl shadow-xl transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] bg-white/5 backdrop-blur-xl border border-white/10 relative overflow-hidden"
+            style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.05), 0 10px 40px rgba(0,0,0,0.4)' }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-3 tracking-wide text-white">
+              <FaLeaf className="text-cyan-400 group-hover:animate-pulse" /> Transport Emission Baseline
             </h2>
-            <Bar data={transportData} />
+            <div className="relative z-10 opacity-90 group-hover:opacity-100 transition-opacity">
+              <Bar data={transportData} options={{ maintainAspectRatio: true, responsive: true }}/>
+            </div>
           </motion.div>
 
-          <motion.div className="bg-white/10 p-6 rounded-2xl shadow-xl border border-white/20">
-            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-              <FaChartBar className="text-green-400" /> CO₂ — Selected Routes
+          <motion.div 
+            className="group p-6 rounded-2xl shadow-xl transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] bg-white/5 backdrop-blur-xl border border-white/10 relative overflow-hidden"
+            style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.05), 0 10px 40px rgba(0,0,0,0.4)' }}
+          >
+             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-3 tracking-wide text-white">
+              <FaChartBar className="text-purple-400 group-hover:rotate-6 transition-transform" /> CO₂ Selected Routes
             </h2>
-            {co2ChartData ? <Bar data={co2ChartData} /> : <div className="text-gray-300">Run a comparison to see CO₂ chart</div>}
+            <div className="relative z-10 opacity-90 group-hover:opacity-100 transition-opacity">
+              {co2ChartData ? <Bar data={co2ChartData} /> : <div className="text-gray-500 italic h-[200px] flex items-center justify-center border border-dashed border-gray-600/50 rounded-xl">Run comparison to see data</div>}
+            </div>
           </motion.div>
 
-          <motion.div className="bg-white/10 p-6 rounded-2xl shadow-xl border border-white/20">
-            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-              <FaUser className="text-green-400" /> You vs Community
+          <motion.div 
+            className="group p-6 rounded-2xl shadow-xl transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] bg-white/5 backdrop-blur-xl border border-white/10 relative overflow-hidden"
+            style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.05), 0 10px 40px rgba(0,0,0,0.4)' }}
+          >
+             <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-3 tracking-wide text-white">
+              <FaUser className="text-sky-400 group-hover:scale-110 transition-transform" /> You vs Community
             </h2>
-            <Radar data={radarData} />
+            <div className="relative z-10 opacity-90 group-hover:opacity-100 transition-opacity">
+              <Radar data={radarData} />
+            </div>
           </motion.div>
         </div>
 
         {/* Results Section */}
         {results && (
-          <div className="bg-white/10 p-6 rounded-2xl shadow-xl mb-10">
-            <h3 className="text-xl font-semibold mb-3">CO₂ Comparison & Savings</h3>
-            <div className="grid md:grid-cols-3 gap-4 mb-4">
-              <div className="p-4 bg-purple-800/30 rounded">
-                <strong>{results.a.mode.toUpperCase()}</strong>
-                <div>Distance: {results.a.distance_km} km</div>
-                <div>Time: {formatDuration(results.a.duration_min * 60)}</div>
-                <div>CO₂: {results.a.co2_kg} kg</div>
+          <div 
+             className="bg-white/5 p-8 rounded-2xl shadow-xl mb-12 border border-white/10 relative overflow-hidden group/results"
+             style={{ backdropFilter: 'blur(16px)' }}
+          >
+             <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full filter blur-3xl pointer-events-none opacity-50 group-hover/results:opacity-100 transition-opacity duration-700" />
+            <h3 className="text-2xl font-bold mb-6 flex items-center gap-3 text-white tracking-wide">
+               <FaWind className="text-cyan-400" /> CO₂ Comparison & Savings
+            </h3>
+            <div className="grid md:grid-cols-3 gap-6 mb-8 relative z-10">
+              <div className="p-6 bg-[#0f172a]/80 backdrop-blur-md rounded-xl border border-white/5 hover:border-cyan-500/30 hover:shadow-[0_10px_30px_rgba(34,211,238,0.15)] transition-all duration-300 transform hover:-translate-y-1">
+                <strong className="block text-xl text-cyan-400 mb-4">{results.a.mode.toUpperCase()}</strong>
+                <div className="space-y-2 text-gray-300">
+                  <div className="flex justify-between"><span>Distance:</span> <span className="font-medium text-white">{results.a.distance_km} km</span></div>
+                  <div className="flex justify-between"><span>Time:</span> <span className="font-medium text-white">{formatDuration(results.a.duration_min * 60)}</span></div>
+                  <div className="flex justify-between"><span>CO₂:</span> <span className="font-medium text-white">{results.a.co2_kg} kg</span></div>
+                </div>
               </div>
 
-              <div className="p-4 bg-purple-800/30 rounded">
-                <strong>{results.b.mode.toUpperCase()}</strong>
-                <div>Distance: {results.b.distance_km} km</div>
-                <div>Time: {formatDuration(results.b.duration_min * 60)}</div>
-                <div>CO₂: {results.b.co2_kg} kg</div>
+              <div className="p-6 bg-[#0f172a]/80 backdrop-blur-md rounded-xl border border-white/5 hover:border-purple-500/30 hover:shadow-[0_10px_30px_rgba(168,85,247,0.15)] transition-all duration-300 transform hover:-translate-y-1">
+                <strong className="block text-xl text-purple-400 mb-4">{results.b.mode.toUpperCase()}</strong>
+                <div className="space-y-2 text-gray-300">
+                  <div className="flex justify-between"><span>Distance:</span> <span className="font-medium text-white">{results.b.distance_km} km</span></div>
+                  <div className="flex justify-between"><span>Time:</span> <span className="font-medium text-white">{formatDuration(results.b.duration_min * 60)}</span></div>
+                  <div className="flex justify-between"><span>CO₂:</span> <span className="font-medium text-white">{results.b.co2_kg} kg</span></div>
+                </div>
               </div>
 
-              <div className="p-4 bg-purple-800/30 rounded">
-                <strong>Summary</strong>
-                <div>Greenest: {results.a.co2_kg < results.b.co2_kg ? results.a.mode : results.b.mode}</div>
-                <div>Fastest: {results.a.duration_min < results.b.duration_min ? results.a.mode : results.b.mode}</div>
+              <div className="p-6 bg-gradient-to-br from-green-900/40 to-emerald-900/40 backdrop-blur-md rounded-xl border border-green-500/20 hover:border-emerald-500/50 hover:shadow-[0_10px_30px_rgba(16,185,129,0.2)] transition-all duration-300 transform hover:-translate-y-1">
+                <strong className="block text-xl text-emerald-400 mb-4 flex items-center gap-2"><FaTrophy /> Summary</strong>
+                <div className="space-y-3 text-gray-200">
+                  <div className="flex justify-between items-center bg-black/20 p-2 rounded-lg">
+                     <span>Greenest:</span> 
+                     <span className="font-bold text-emerald-300 px-3 py-1 bg-emerald-500/20 rounded-md">
+                        {results.a.co2_kg < results.b.co2_kg ? results.a.mode.toUpperCase() : results.b.mode.toUpperCase()}
+                     </span>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/20 p-2 rounded-lg">
+                     <span>Fastest:</span> 
+                     <span className="font-bold text-blue-300 px-3 py-1 bg-blue-500/20 rounded-md">
+                        {results.a.duration_min < results.b.duration_min ? results.a.mode.toUpperCase() : results.b.mode.toUpperCase()}
+                     </span>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* quick action: copy or create offset suggestion */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4 relative z-10">
               <button
                 onClick={() => {
                   const text = `Comparing ${origin} → ${destination}: ${results.a.mode.toUpperCase()} ${results.a.co2_kg}kg vs ${results.b.mode.toUpperCase()} ${results.b.co2_kg}kg CO₂`;
                   navigator.clipboard?.writeText(text);
                 }}
-                className="px-3 py-2 rounded bg-white/6 hover:bg-white/8"
+                className="px-6 py-2.5 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 transition-all duration-300 font-medium hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:-translate-y-0.5"
               >
-                Copy summary
+                Copy Summary
               </button>
 
               <button
@@ -669,9 +750,9 @@ export default function Comparison() {
                   const saved = (other.co2_kg - green.co2_kg).toFixed(3);
                   alert(`If you choose ${green.mode.toUpperCase()} you save ~${saved} kg CO₂ for this trip. Consider planting a tree or donating to a verified carbon offset program.`);
                 }}
-                className="px-3 py-2 rounded bg-amber-500 text-black font-semibold hover:bg-amber-400"
+                className="px-6 py-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-bold hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:-translate-y-0.5 flex items-center gap-2"
               >
-                Offset suggestion
+                <FaLeaf /> Offset Suggestion
               </button>
             </div>
           </div>
@@ -679,56 +760,92 @@ export default function Comparison() {
 
         {/* AQI Section (added) */}
         {(aqiOrigin !== null || aqiDest !== null) && (
-          <div className="bg-white/10 p-6 rounded-2xl shadow-xl mb-6">
-            <h3 className="text-xl font-semibold mb-3">Air Quality (AQI)</h3>
+          <div 
+             className="bg-white/5 p-8 rounded-2xl shadow-xl mb-12 border border-white/10"
+             style={{ backdropFilter: 'blur(16px)' }}
+          >
+            <h3 className="text-2xl font-bold mb-6 text-white tracking-wide">Air Quality (AQI) Context</h3>
 
-            <div className="grid md:grid-cols-2 gap-4 mb-4">
-              <AQICard place={origin || "Origin"} aqiData={aqiOrigin} />
-              <AQICard place={destination || "Destination"} aqiData={aqiDest} />
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="hover:-translate-y-1 transition-transform duration-300">
+                 <AQICard place={origin || "Origin"} aqiData={aqiOrigin} />
+              </div>
+              <div className="hover:-translate-y-1 transition-transform duration-300">
+                 <AQICard place={destination || "Destination"} aqiData={aqiDest} />
+              </div>
             </div>
 
-            <div className="flex items-center gap-4 mb-4">
-              <div className="text-sm text-gray-300">AQI Chart</div>
-              <label className="text-sm ml-auto text-gray-300">Show trend</label>
-              <input type="checkbox" checked={showAQIChart} onChange={() => setShowAQIChart(!showAQIChart)} className="scale-125" />
+            <div className="flex items-center gap-4 mb-6 bg-white/5 p-4 rounded-xl border border-white/5 inline-flex w-full md:w-auto">
+              <div className="text-sm text-gray-300 font-medium">Historical AQI Chart</div>
+              <label className="text-sm ml-auto text-gray-300 flex items-center gap-2 cursor-pointer">
+                 Show trend
+                 <input type="checkbox" checked={showAQIChart} onChange={() => setShowAQIChart(!showAQIChart)} className="w-4 h-4 rounded border-gray-600 focus:ring-cyan-500 focus:ring-2 cursor-pointer" />
+              </label>
             </div>
 
-            {showAQIChart && <Line data={aqiTrendData(aqiOrigin?.aqi, aqiDest?.aqi)} />}
+            {showAQIChart && (
+               <div className="bg-[#0f172a]/50 p-6 rounded-xl border border-white/5">
+                  <Line data={aqiTrendData(aqiOrigin?.aqi, aqiDest?.aqi)} options={{ maintainAspectRatio: false }} height={250}/>
+               </div>
+            )}
           </div>
         )}
 
         {/* NEW CO₂ Chart (duplicated lower for layout continuity) */}
         {results && (
-          <div className="bg-white/10 p-6 rounded-xl mb-6">
-            <h2 className="text-2xl mb-3">Actual Route Comparison</h2>
-            <Bar data={co2ChartData} />
+          <div className="bg-white/5 backdrop-blur-xl p-8 rounded-2xl mb-12 border border-white/10 shadow-xl group hover:-translate-y-1 hover:border-white/20 transition-all duration-300">
+            <h2 className="text-2xl font-bold mb-6 text-white tracking-wide flex items-center gap-2">
+               <FaChartBar className="text-sky-400 group-hover:rotate-12 transition-transform" /> Detailed CO₂ Baseline
+            </h2>
+            <div className="bg-[#0f172a]/50 p-6 rounded-xl border border-white/5">
+               <Bar data={co2ChartData} options={{ maintainAspectRatio: false }} height={300} />
+            </div>
           </div>
         )}
 
         {/* Map */}
-        <h2 className="text-2xl font-semibold mb-3">Live Satellite Map (two routes + traffic)</h2>
-        <div ref={mapRef} style={{ height: "480px", width: "100%" }} className="mb-10 rounded-2xl shadow-lg border border-white/20"></div>
+        <h2 className="text-2xl font-bold mb-6 text-white tracking-wide flex items-center gap-3">
+           <FaMapMarkedAlt className="text-cyan-400" /> Live Hybrid Routing Base
+        </h2>
+        <div 
+          ref={mapRef} 
+          style={{ height: "550px", width: "100%" }} 
+          className="mb-12 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden ring-1 ring-white/10 hover:ring-cyan-500/50 transition-all duration-500 bg-[#0f172a]/80 flex items-center justify-center"
+        >
+           {/* Loader if map is empty - purely visual fallback until google loads */}
+           {!mapInstance.current && !results && <div className="text-gray-500 animate-pulse">Awaiting Route Data...</div>}
+        </div>
 
         {/* Leaderboard Section (dynamic) */}
-        <motion.div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-white/20">
-          <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-            <FaTrophy className="text-yellow-400" /> Top Eco Heroes
+        <motion.div 
+          className="bg-white/5 backdrop-blur-2xl p-8 rounded-2xl shadow-2xl border border-white/10 relative overflow-hidden group/board hover:border-yellow-500/30 transition-all duration-500"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <div className="absolute -top-32 -right-32 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl group-hover/board:bg-yellow-500/20 transition-colors duration-700 pointer-events-none"></div>
+          
+          <h2 className="text-3xl font-bold mb-8 flex items-center gap-3 tracking-wide text-white relative z-10">
+            <FaTrophy className="text-yellow-400 group-hover/board:rotate-12 group-hover/board:scale-110 transition-all duration-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]" /> Top Community Eco Heroes
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 mx-auto lg:grid-cols-3 gap-6 relative z-10">
             {leaderboard.length === 0 ? (
-              <div className="text-gray-300">No leaderboard data yet.</div>
+              <div className="text-gray-400 col-span-full text-center py-10 bg-[#0f172a]/50 rounded-xl border border-white/5">No leaderboard data found. Complete a greener journey to place first!</div>
             ) : (
               leaderboard.map((entry, index) => (
-                <div key={index} className="bg-purple-800/60 border border-purple-400/50 rounded-lg p-4 flex flex-col items-center hover:bg-purple-700/60 transition-all">
-                  <span className="text-4xl mb-2">{index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `${index + 1}`}</span>
-                  <h3 className="text-lg font-semibold">{entry.user?.name || entry.name || "Unknown"}</h3>
-                  <p className="text-sm text-gray-300">{Number(entry.ecoPoints || entry.points || 0).toFixed(2)} Eco Points</p>
+                <div 
+                  key={index} 
+                  className="bg-[#0f172a]/60 backdrop-blur-md border border-white/5 rounded-xl p-6 flex flex-col items-center hover:bg-[#1e293b]/80 hover:-translate-y-2 hover:border-yellow-500/30 hover:shadow-[0_15px_30px_rgba(234,179,8,0.15)] transition-all duration-300"
+                >
+                  <span className="text-5xl mb-4 drop-shadow-md">{index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `${index + 1}`}</span>
+                  <h3 className="text-xl font-bold text-white mb-1">{entry.user?.name || entry.name || "Unknown Hero"}</h3>
+                  <p className="text-sm text-yellow-500 font-semibold uppercase tracking-wider mb-3">{Number(entry.ecoPoints || entry.points || 0).toFixed(2)} Points</p>
 
-                  {/* Badge - use backend badge if present, otherwise compute locally */}
-                  <p className="text-sm mt-1 font-bold">{entry.badge || computeBadgeFromPoints(entry.ecoPoints || entry.points || 0)}</p>
+                  <div className="w-full h-px bg-white/10 my-2"></div>
 
-                  <p className="text-xs text-gray-400">{Number(entry.totalCO2Saved || entry.total_co2_saved || 0).toFixed(3)} kg CO₂ saved</p>
+                  <p className="text-sm mt-2 font-bold text-gray-200">{entry.badge || computeBadgeFromPoints(entry.ecoPoints || entry.points || 0)}</p>
+                  <p className="text-xs text-gray-400 mt-1">{Number(entry.totalCO2Saved || entry.total_co2_saved || 0).toFixed(3)} kg CO₂ avoided</p>
                 </div>
               ))
             )}

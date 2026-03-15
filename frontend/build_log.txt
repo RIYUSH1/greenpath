@@ -1,0 +1,71 @@
+﻿[36mvite v7.1.10 [32mbuilding for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 24 modules transformed.
+node.exe : [31mΓ£ù[39m 
+Build failed in 289ms
+At C:\Users\ASUS\Desktop\gree
+npath\frontend\node_modules\.
+bin\vite.ps1:24 char:5
++     & "node$exe"  "$basedir
+/../vite/bin/vite.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: ([31mΓ£  
+  ù[39m Build failed in 2   
+ 89ms:String) [], RemoteE    
+xception
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+[31merror during build:
+[31m[vite:esbuild] 
+Transform failed with 1 
+error:
+C:/Users/ASUS/Desktop/greenpa
+th/frontend/src/pages/Home/Ho
+me.jsx:341:0: ERROR: 
+Expected ")" but found end 
+of file[31m
+file: [36mC:/Users/ASUS/Desk
+top/greenpath/frontend/src/pa
+ges/Home/Home.jsx:341:0[31m
+[33m
+[33mExpected ")" but found 
+end of file[33m
+
+[31m
+    at failureErrorWithLog (C
+:\Users\ASUS\Desktop\greenpat
+h\frontend\node_modules\esbui
+ld\lib\main.js:1467:15)
+    at C:\Users\ASUS\Desktop\
+greenpath\frontend\node_modul
+es\esbuild\lib\main.js:736:50
+    at 
+responseCallbacks.<computed> 
+(C:\Users\ASUS\Desktop\greenp
+ath\frontend\node_modules\esb
+uild\lib\main.js:603:9)
+    at handleIncomingPacket (
+C:\Users\ASUS\Desktop\greenpa
+th\frontend\node_modules\esbu
+ild\lib\main.js:658:12)
+    at Socket.readFromStdout 
+(C:\Users\ASUS\Desktop\greenp
+ath\frontend\node_modules\esb
+uild\lib\main.js:581:7)
+    at Socket.emit 
+(node:events:518:28)
+    at addChunk (node:interna
+l/streams/readable:561:12)
+    at 
+readableAddChunkPushByteMode 
+(node:internal/streams/readab
+le:512:3)
+    at Readable.push (node:in
+ternal/streams/readable:392:5
+)
+    at Pipe.onStreamRead (nod
+e:internal/stream_base_common
+s:189:23)[39m

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_BASE_URL } from "../api/config";
 
 export default function NightSafety() {
   const [place, setPlace] = useState("");
@@ -17,8 +18,8 @@ export default function NightSafety() {
     setResult(null);
 
     try {
-      // ✅ IMPORTANT: FULL BACKEND URL (Flask)
-      const res = await fetch("http://127.0.0.1:5000/api/night-safety", {
+      // ✅ Using Centralized API Base URL
+      const res = await fetch(`${API_BASE_URL}/api/night-safety`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
