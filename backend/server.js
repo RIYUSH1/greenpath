@@ -28,7 +28,7 @@ const aqiRoutes = require("./routes/aqi");
 const safetyRoutes = require("./routes/safety");
 
 // ✅ MongoDB Connect
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/greenways";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/greenpath";
 mongoose.set("strictQuery", true);
 mongoose
   .connect(MONGO_URI)

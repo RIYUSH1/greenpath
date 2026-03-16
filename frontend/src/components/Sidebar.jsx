@@ -41,7 +41,7 @@ export default function Sidebar({ isDark, toggleTheme }) {
           className={`ml-4 text-xl font-bold bg-gradient-to-r from-cyan-600 to-purple-600 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent transition-opacity duration-300 whitespace-nowrap
             ${isHovered ? "opacity-100" : "opacity-0"}`}
         >
-          GreenWays
+          Greenpath
         </span>
       </div>
 

@@ -18,7 +18,7 @@ export default function Intro({ onFinish }) {
         muted
         playsInline
         preload="auto"
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover filter brightness-[1.1]"
       />
     </div>
   );

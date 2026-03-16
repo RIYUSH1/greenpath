@@ -75,7 +75,7 @@ export default function Home() {
               loop
               muted
               playsInline
-              className="absolute inset-0 w-full h-full object-cover filter brightness-[0.7] contrast-125 saturate-150 transition-transform duration-1000 group-hover:scale-105"
+              className="absolute inset-0 w-full h-full object-cover filter brightness-[1.1] contrast-125 saturate-150 transition-transform duration-1000 group-hover:scale-105"
             />
 
             {/* Gradient Overlay */}
@@ -203,7 +203,7 @@ export default function Home() {
               loop
               muted
               playsInline
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-[0.8] contrast-125 saturate-150"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-[1.1] contrast-125 saturate-150"
             />
           </div>
 
@@ -242,7 +242,7 @@ export default function Home() {
               viewport={{ once: true }}
               className="text-gray-300 text-lg leading-relaxed max-w-md"
             >
-              GreenWays predicts safer night routes using AI-based safety,
+              Greenpath predicts safer night routes using AI-based safety,
               lighting, activity, and environmental data. Your journey, optimized for well-being.
             </motion.p>
             
@@ -495,7 +495,7 @@ export default function Home() {
               loop
               muted
               playsInline
-              className="w-full h-[350px] rounded-2xl object-cover filter brightness-[0.8] contrast-[1.25] saturate-150 transition-transform duration-700 group-hover:scale-105"
+              className="w-full h-[350px] rounded-2xl object-cover filter brightness-[1.1] contrast-[1.25] saturate-150 transition-transform duration-700 group-hover:scale-105"
             />
           </motion.div>
         </div>
@@ -511,13 +511,13 @@ export default function Home() {
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover filter brightness-[0.6] contrast-[1.15] saturate-[1.2] transition-transform duration-1000 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover filter brightness-[0.9] contrast-[1.15] saturate-[1.2] transition-transform duration-1000 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#020617]/50 to-[#020617]"></div>
           
           <div className="absolute bottom-16 left-0 right-0 text-center z-10 space-y-8">
             <h3 className="text-4xl md:text-5xl font-extrabold text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-              Ready to experience <span className="text-cyan-400">GreenWays?</span>
+              Ready to experience <span className="text-cyan-400">Greenpath?</span>
             </h3>
             <button className="relative group/btn overflow-hidden bg-white/10 backdrop-blur-md border border-cyan-500/50 text-cyan-50 px-10 py-4 rounded-full font-bold shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all duration-300 hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] text-lg uppercase tracking-wider">
               <span className="relative z-10">Start Your Journey</span>
