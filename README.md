@@ -35,9 +35,9 @@ GreenPath is a cutting-edge, full-stack AI-driven web application designed to pr
 
 ## 📸 Screenshots
 
-| Home Dashboard | AI Night Safety Score |
-| :---: | :---: |
-| ![Home](screenshots/home.png) | ![Safety Score](screenshots/safetyscore.png) |
+| Route Comparison | AI Night Safety Score | Route Analysis |
+| :---: | :---: | :---: |
+| ![Comparison](screenshots/comparison.png) | ![Safety Score](screenshots/safetyscore.png) | ![Route Safety](screenshots/routesafety.png) |
 
 ---
 
