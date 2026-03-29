@@ -20,32 +20,33 @@ import {
 } from "recharts";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { useRef } from "react";
+import { nodeClient } from "../../api/apiClient";
+
 
 
 /* ================= MOCK API ================= */
 
-const fetchEcoData = () =>
-  new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        carbon: 60.29,
-        points: 1420,
-        streak: 7,
-        trees: 5,
-        energy: 18.2,
-        rank: "Gold",
-        weekly: [
-          { day: "Mon", co2: 4.2 },
-          { day: "Tue", co2: 5.1 },
-          { day: "Wed", co2: 6.0 },
-          { day: "Thu", co2: 6.8 },
-          { day: "Fri", co2: 7.2 },
-          { day: "Sat", co2: 8.1 },
-          { day: "Sun", co2: 8.6 },
-        ],
-      });
-    }, 1200);
-  });
+/* ================= API FETCH ================= */
+
+const fetchEcoData = async () => {
+  try {
+    const response = await nodeClient.get("/api/dashboard/stats");
+    return response.data;
+  } catch (error) {
+    console.error("Dashboard fetch error:", error);
+    // Fallback to mock if API fails during initial deployment test
+    return {
+      carbon: 0,
+      points: 0,
+      streak: 0,
+      trees: 0,
+      energy: 0,
+      rank: "Newbie",
+      weekly: []
+    };
+  }
+};
+
 
 /* ================= CONFETTI ================= */
 

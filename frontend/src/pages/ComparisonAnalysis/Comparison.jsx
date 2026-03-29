@@ -9,8 +9,9 @@ import fetchAQIProxy from "../../utils/fetchAQI_via_proxy";
 import EcoPreferenceSelector from "../../components/EcoPreferenceSelector";
 import { getEcoPreferences } from "../../utils/ecoPreferences";
 import RouteMap from "../../components/RouteMap";
-import { API_BASE_URL } from "../../api/config";
+import { nodeClient } from "../../api/apiClient";
 import LoadingOverlay from "../../components/LoadingOverlay";
+
 
 
 
@@ -56,7 +57,7 @@ function formatDuration(seconds) {
 /* ===================== Backend ORS Fetch ===================== */
 const fetchRoutes = async (origin, destination, profile) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/api/external/ors-route`, {
+    const response = await nodeClient.post("/api/external/ors-route", {
       origin,
       destination,
       profile,
@@ -67,6 +68,7 @@ const fetchRoutes = async (origin, destination, profile) => {
     return null;
   }
 };
+
 
 /* ===================== Google travel mode mapping ===================== */
 const googleModeMap = {
@@ -216,7 +218,8 @@ export default function Comparison() {
   /* ===================== Fetch Leaderboard ===================== */
   const fetchLeaderboard = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/leaderboard`);
+      const res = await nodeClient.get("/api/leaderboard");
+
       // backend may return array or { data: [] } depending on implementation
       setLeaderboard(Array.isArray(res.data) ? res.data : res.data?.data || []);
     } catch (err) {
@@ -445,12 +448,13 @@ export default function Comparison() {
       const userId = localStorage.getItem("userId");
       if (userId && co2_saved >= 0.01) {
         try {
-          await axios.post(`${API_BASE_URL}/api/leaderboard/update`, {
+          await nodeClient.post("/api/leaderboard/update", {
             userId,
             co2Saved: co2_saved,
           });
           fetchLeaderboard();
         } catch (err) {
+
           console.error("Failed to post leaderboard update:", err.response?.data || err.message);
         }
       }
