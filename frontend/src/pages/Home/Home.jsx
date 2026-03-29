@@ -13,6 +13,8 @@ import {
   FiSearch
 } from "react-icons/fi";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+
 
 /* =========================
    VIDEOS & IMAGES (Preserved)
@@ -28,7 +30,9 @@ import nature3Img from "../../assets/nature3.jpeg";
 import safetyImg from "../../assets/safety.jpeg";
 
 export default function Home() {
+  const navigate = useNavigate();
   const heroRef = useRef(null);
+
   const introRef = useRef(null);
   const safetyVideoRef = useRef(null);
   const endVideoRef = useRef(null);
@@ -58,14 +62,14 @@ export default function Home() {
       <div className="absolute top-[40rem] left-1/3 w-96 h-96 bg-blue-600/20 rounded-full mix-blend-screen filter blur-[100px] opacity-70 pointer-events-none" style={{ animationDelay: '4s' }}></div>
 
       {/* ================= HERO SECTION ================= */}
-      <section className="max-w-7xl mx-auto px-6 mt-8 relative z-10">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 mt-4 md:mt-8 relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="relative bg-white/5 dark:bg-[#0f172a]/60 backdrop-blur-2xl border border-white/10 dark:border-white/5 p-2 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_60px_rgba(34,211,238,0.15)] transition-all duration-700"
+          className="relative bg-white/5 dark:bg-[#0f172a]/60 backdrop-blur-2xl border border-white/10 dark:border-white/5 p-1.5 md:p-2 rounded-[1.5rem] md:rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:shadow-[0_20px_60px_rgba(34,211,238,0.15)] transition-all duration-700"
         >
-          <div className="relative rounded-[2rem] overflow-hidden h-[60vh] md:h-[70vh] group">
+          <div className="relative rounded-[1.2rem] md:rounded-[2rem] overflow-hidden min-h-[500px] h-[550px] group">
             
             {/* Background Video */}
             <video
@@ -86,11 +90,11 @@ export default function Home() {
             <div className="absolute top-1/2 right-1/4 transform -translate-y-1/2 w-64 h-64 border-2 border-cyan-400/30 rounded-full animate-[spin_20s_linear_infinite] pointer-events-none" />
             <div className="absolute top-1/2 right-1/4 transform -translate-y-1/2 w-48 h-48 border border-purple-400/40 rounded-full animate-[spin_15s_linear_infinite_reverse] pointer-events-none" />
 
-            {/* Animated Icons Floating */}
+            {/* Animated Icons Floating (Hidden on Mobile to avoid clutter/overlap) */}
             <motion.div 
               animate={{ y: [-10, 10, -10] }} 
               transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-              className="absolute top-1/4 right-[30%] bg-[#0a0f18]/80 backdrop-blur-md p-3 rounded-2xl border border-white/10 shadow-lg flex items-center gap-3"
+              className="hidden lg:flex absolute top-1/4 right-[30%] bg-[#0a0f18]/80 backdrop-blur-md p-3 rounded-2xl border border-white/10 shadow-lg items-center gap-3"
             >
               <div className="p-2 bg-cyan-500/20 rounded-full"><FiCheckCircle className="text-cyan-400 w-5 h-5"/></div>
               <span className="text-sm font-semibold text-white pr-2">Safe Route</span>
@@ -99,7 +103,7 @@ export default function Home() {
             <motion.div 
               animate={{ y: [10, -10, 10] }} 
               transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-              className="absolute top-[40%] right-[15%] bg-[#0a0f18]/80 backdrop-blur-md p-3 rounded-2xl border border-white/10 shadow-lg flex items-center gap-3"
+              className="hidden lg:flex absolute top-[40%] right-[15%] bg-[#0a0f18]/80 backdrop-blur-md p-3 rounded-2xl border border-white/10 shadow-lg items-center gap-3"
             >
               <div className="p-2 bg-purple-500/20 rounded-full"><FiCpu className="text-purple-400 w-5 h-5"/></div>
               <span className="text-sm font-semibold text-white pr-2">AI Analyzing</span>
@@ -108,35 +112,40 @@ export default function Home() {
             <motion.div 
               animate={{ y: [-8, 8, -8] }} 
               transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
-              className="absolute bottom-1/3 right-[35%] bg-[#0a0f18]/80 backdrop-blur-md p-3 rounded-2xl border border-white/10 shadow-lg flex items-center gap-3 opacity-80"
+              className="hidden lg:flex absolute bottom-1/3 right-[35%] bg-[#0a0f18]/80 backdrop-blur-md p-3 rounded-2xl border border-white/10 shadow-lg items-center gap-3 opacity-80"
             >
+
               <div className="p-2 bg-red-500/20 rounded-full"><FiAlertTriangle className="text-red-400 w-5 h-5"/></div>
               <span className="text-sm font-semibold text-gray-300 pr-2">Avoid Zone</span>
             </motion.div>
 
             {/* Hero Content */}
-            <div className="relative z-10 h-full flex flex-col justify-center px-10 md:px-20 max-w-3xl">
+            <div className="relative z-10 h-full flex flex-col justify-center px-6 md:px-20 max-w-3xl">
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
               >
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-6 md:mb-8">
                   <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                  <span className="text-cyan-300 text-sm font-semibold tracking-wide uppercase">AI-Powered Navigation</span>
+                  <span className="text-cyan-300 text-xs md:text-sm font-semibold tracking-wide uppercase">AI-Powered Navigation</span>
                 </div>
                 
-                <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] mb-6 drop-shadow-2xl">
-                  Intelligent <br/>
+                <h1 className="text-3xl sm:text-4xl md:text-7xl font-extrabold text-white leading-tight md:leading-[1.1] mb-6 drop-shadow-2xl">
+                  Intelligent <br className="hidden sm:block"/>
                   <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 text-transparent bg-clip-text">Safety Routing.</span>
                 </h1>
                 
-                <p className="text-lg md:text-xl text-gray-300 max-w-xl font-light leading-relaxed mb-10">
-                 
+                <p className="text-sm md:text-xl text-gray-300 max-w-xl font-light leading-relaxed mb-8 md:mb-10">
+                  Real-time environmental analytics and predictive safety mapping for your urban journeys.
                 </p>
 
-                <button className="relative group overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 text-white font-bold shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]">
-                  <span className="relative z-10 flex items-center gap-2">
+
+            <button 
+              onClick={() => navigate("/route-comparison")}
+              className="w-full sm:w-auto relative group overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 text-white font-bold shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]"
+            >
+                  <span className="relative z-10 flex items-center justify-center gap-2">
                     <FiNavigation className="w-5 h-5" />
                     Start Safe Journey
                   </span>
@@ -150,8 +159,8 @@ export default function Home() {
       </section>
 
       {/* ================= FLASH INFO CARDS ================= */}
-      <section className="max-w-7xl mx-auto px-6 -mt-10 relative z-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 -mt-8 md:-mt-10 relative z-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {flashCards.map((card, index) => (
             <motion.div
               key={index}
@@ -183,7 +192,8 @@ export default function Home() {
       </section>
 
       {/* ================= INTRO + MAP (RESTORED) ================= */}
-      <section className="max-w-7xl mx-auto px-6 mt-24 mb-16 relative z-10">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 mt-20 md:mt-24 mb-16 relative z-10">
+
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -219,7 +229,8 @@ export default function Home() {
       </section>
 
       {/* ================= CONTENT & SEARCH BAR (RESTORED) ================= */}
-      <section className="max-w-7xl mx-auto px-6 mb-24 relative z-10">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 mb-24 relative z-10">
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           
           <div className="space-y-8">
@@ -227,13 +238,14 @@ export default function Home() {
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="text-4xl md:text-5xl font-extrabold leading-tight text-white drop-shadow-lg"
+              className="text-3xl md:text-5xl font-extrabold leading-tight text-white drop-shadow-lg"
             >
-              Navigate with Purpose. <br />
+              Navigate with Purpose. <br className="hidden sm:block" />
               <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">
                 Breathe with Ease.
               </span>
             </motion.h2>
+
 
             <motion.p 
               initial={{ opacity: 0, x: -20 }}
@@ -247,7 +259,7 @@ export default function Home() {
             </motion.p>
             
             {/* Nature Image */}
-            <div className="h-[240px] rounded-3xl overflow-hidden border border-white/10 shadow-xl group border-t-cyan-500/30">
+            <div className="aspect-[4/3] md:h-[240px] rounded-3xl overflow-hidden border border-white/10 shadow-xl group border-t-cyan-500/30">
               <img
                 src={nature3Img}
                 alt="Eco Nature"
@@ -262,19 +274,19 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="flex bg-[#0f172a]/80 backdrop-blur-2xl rounded-2xl border border-white/10 overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.5)] p-1 group hover:border-cyan-500/50 transition-colors"
+              className="flex flex-col sm:flex-row bg-[#0f172a]/80 backdrop-blur-2xl rounded-2xl border border-white/10 overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.5)] p-1.5 group hover:border-cyan-500/50 transition-colors"
             >
               <input
                 placeholder="Where are you going today?"
-                className="flex-1 bg-transparent px-6 py-4 outline-none text-white placeholder-gray-500 text-sm md:text-base"
+                className="flex-1 bg-transparent px-6 py-4 outline-none text-white placeholder-gray-500 text-sm md:text-base mb-2 sm:mb-0"
               />
-              <button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-8 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-lg hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]">
+              <button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-8 py-3 sm:py-0 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]">
                 <FiSearch /> Search
               </button>
             </motion.div>
             
             {/* Second Smart City Image Map Preview */}
-            <div className="h-[260px] rounded-3xl overflow-hidden border border-white/10 shadow-xl group border-t-purple-500/30">
+            <div className="aspect-[4/3] md:h-[260px] rounded-3xl overflow-hidden border border-white/10 shadow-xl group border-t-purple-500/30">
               <img
                 src={smartCityImg}
                 alt="Smart City Dashboard"
@@ -286,7 +298,8 @@ export default function Home() {
       </section>
 
       {/* ================= DASHBOARD ELEMENTS ================= */}
-      <section className="max-w-7xl mx-auto px-6 mt-24 mb-20 relative z-10">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 mt-20 md:mt-24 mb-20 relative z-10">
+
         
         {/* ROW 1: Quick Stats & Route Comparison */}
         <div className="flex flex-col md:flex-row gap-8 mb-8">
@@ -453,31 +466,32 @@ export default function Home() {
       </section>
 
       {/* ================= NIGHT SAFETY COMPARISON (RESTORED) ================= */}
-      <section className="max-w-7xl mx-auto px-6 mb-32 relative z-10">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 mb-32 relative z-10">
         <motion.h2 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-4xl md:text-5xl font-extrabold text-center mb-16 flex items-center justify-center gap-4 text-white drop-shadow-xl"
+          className="text-3xl md:text-5xl font-extrabold text-center mb-10 md:mb-16 flex items-center justify-center gap-4 text-white drop-shadow-xl"
         >
+
           <span className="p-3 bg-indigo-500/20 border border-indigo-500/30 rounded-2xl text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.5)]">
             <FiShield />
           </span>
           Night Safety Comparison
         </motion.h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
           {/* Comparison Image */}
           <motion.div 
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-white/5 dark:bg-[#0f172a]/70 backdrop-blur-xl border border-white/10 p-4 rounded-[2rem] shadow-2xl hover:-translate-y-3 hover:scale-105 hover:bg-[#1e293b]/90 hover:border-cyan-500/50 hover:shadow-[0_15px_50px_rgba(6,182,212,0.3)] transition-all duration-500 group cursor-pointer"
+            className="bg-white/5 dark:bg-[#0f172a]/70 backdrop-blur-xl border border-white/10 p-2 md:p-4 rounded-[1.5rem] md:rounded-[2rem] shadow-2xl hover:-translate-y-2 lg:hover:-translate-y-3 hover:scale-[1.02] lg:hover:scale-105 hover:bg-[#1e293b]/90 hover:border-cyan-500/50 hover:shadow-[0_15px_50px_rgba(6,182,212,0.3)] transition-all duration-500 group cursor-pointer"
           >
             <img
               src={safetyImg}
               alt="Safety Comparison"
-              className="w-full h-[350px] object-cover rounded-2xl filter brightness-[0.8] contrast-125 saturate-150 transition-transform duration-700 group-hover:scale-105"
+              className="w-full aspect-[4/3] md:h-[350px] object-cover rounded-2xl filter brightness-[0.8] contrast-125 saturate-150 transition-transform duration-700 lg:group-hover:scale-105"
             />
           </motion.div>
 
@@ -486,7 +500,7 @@ export default function Home() {
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-white/5 dark:bg-[#0f172a]/70 backdrop-blur-xl border border-white/10 p-4 rounded-[2rem] shadow-2xl hover:-translate-y-3 hover:scale-105 hover:bg-[#1e293b]/90 hover:border-purple-500/50 hover:shadow-[0_15px_50px_rgba(168,85,247,0.3)] transition-all duration-500 group overflow-hidden cursor-pointer"
+            className="bg-white/5 dark:bg-[#0f172a]/70 backdrop-blur-xl border border-white/10 p-2 md:p-4 rounded-[1.5rem] md:rounded-[2rem] shadow-2xl hover:-translate-y-2 lg:hover:-translate-y-3 hover:scale-[1.02] lg:hover:scale-105 hover:bg-[#1e293b]/90 hover:border-purple-500/50 hover:shadow-[0_15px_50px_rgba(168,85,247,0.3)] transition-all duration-500 group overflow-hidden cursor-pointer"
           >
             <video
               ref={safetyVideoRef}
@@ -495,15 +509,15 @@ export default function Home() {
               loop
               muted
               playsInline
-              className="w-full h-[350px] rounded-2xl object-cover filter brightness-[1.1] contrast-[1.25] saturate-150 transition-transform duration-700 group-hover:scale-105"
+              className="w-full aspect-[4/3] md:h-[350px] rounded-2xl object-cover filter brightness-[1.1] contrast-[1.25] saturate-150 transition-transform duration-700 lg:group-hover:scale-105"
             />
           </motion.div>
         </div>
       </section>
 
       {/* ================= END VIDEO (RESTORED) ================= */}
-      <section className="max-w-7xl mx-auto px-6 relative z-10 mb-10">
-        <div className="relative w-full h-[60vh] rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 group">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 relative z-10 mb-10">
+        <div className="relative w-full h-[50vh] md:h-[60vh] rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 group">
           <video
             ref={endVideoRef}
             src={endVideo}
@@ -511,15 +525,18 @@ export default function Home() {
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover filter brightness-[0.9] contrast-[1.15] saturate-[1.2] transition-transform duration-1000 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover filter brightness-[0.9] contrast-[1.15] saturate-[1.2] transition-transform duration-1000 lg:group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#020617]/50 to-[#020617]"></div>
           
-          <div className="absolute bottom-16 left-0 right-0 text-center z-10 space-y-8">
-            <h3 className="text-4xl md:text-5xl font-extrabold text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-              Ready to experience <span className="text-cyan-400">Greenpath?</span>
+          <div className="absolute bottom-10 md:bottom-16 left-4 right-4 text-center z-10 space-y-6 md:space-y-8">
+            <h3 className="text-2xl md:text-5xl font-extrabold text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+              Ready to experience <br className="md:hidden" /> <span className="text-cyan-400">Greenpath?</span>
             </h3>
-            <button className="relative group/btn overflow-hidden bg-white/10 backdrop-blur-md border border-cyan-500/50 text-cyan-50 px-10 py-4 rounded-full font-bold shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all duration-300 hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] text-lg uppercase tracking-wider">
+            <button 
+              onClick={() => navigate("/route-comparison")}
+              className="w-full sm:w-auto relative group/btn overflow-hidden bg-white/10 backdrop-blur-md border border-cyan-500/50 text-cyan-50 px-10 py-4 rounded-full font-bold shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all duration-300 hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] text-sm md:text-lg uppercase tracking-wider"
+            >
               <span className="relative z-10">Start Your Journey</span>
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-blue-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
             </button>

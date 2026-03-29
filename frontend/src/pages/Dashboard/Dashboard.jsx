@@ -85,9 +85,7 @@ function Confetti() {
 }
 
 /* ================= MAIN ================= */
-
 export default function EcoDashboard() {
-  const [dark, setDark] = useState(false);
   const [data, setData] = useState(null);
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -103,33 +101,29 @@ export default function EcoDashboard() {
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading Eco Dashboard...
+      <div className="min-h-screen flex items-center justify-center text-emerald-500 font-bold">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+          Loading Eco Dashboard...
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={dark ? "dark" : ""}>
+    <>
       {showConfetti && <Confetti />}
 
       <div className="min-h-screen transition-all duration-500
-        bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500
-        dark:from-gray-900 dark:via-gray-800 dark:to-gray-900
-        text-gray-900 dark:text-white px-4 py-8">
+        bg-transparent text-gray-900 dark:text-white px-4 md:px-6 py-6 md:py-8">
 
         {/* HEADER */}
-        <div className="flex justify-between items-center mb-10">
-          <h1 className="text-3xl font-extrabold flex items-center gap-2">
+        <div className="flex justify-between items-center mb-6 md:mb-10">
+          <h1 className="text-xl md:text-3xl font-extrabold flex items-center gap-2">
             🌱 Eco Dashboard
           </h1>
-          <button
-            onClick={() => setDark(!dark)}
-            className="p-3 rounded-full bg-white/20 backdrop-blur-lg"
-          >
-            {dark ? <FaSun /> : <FaMoon />}
-          </button>
         </div>
+
 
         {/* STATS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
@@ -143,38 +137,46 @@ export default function EcoDashboard() {
 
         {/* CHART */}
         <div className="bg-white/20 dark:bg-white/10 backdrop-blur-lg
-          rounded-3xl p-6 shadow-xl mb-10">
-          <h2 className="text-xl font-bold mb-4">
+          rounded-[2rem] p-4 md:p-8 shadow-xl mb-10 overflow-hidden">
+          <h2 className="text-lg md:text-xl font-bold mb-6">
             Weekly CO₂ Savings
           </h2>
 
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data.weekly}>
-              <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-              <XAxis dataKey="day" />
-              <YAxis />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="co2"
-                stroke="#34d399"
-                strokeWidth={3}
-                dot={{ r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data.weekly} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.1} />
+                <XAxis dataKey="day" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis fontSize={12} tickLine={false} axisLine={false} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: 'none', borderRadius: '12px', fontSize: '12px' }}
+                  itemStyle={{ color: '#34d399' }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="co2"
+                  stroke="#34d399"
+                  strokeWidth={4}
+                  dot={{ r: 4, fill: '#34d399', strokeWidth: 2 }}
+                  activeDot={{ r: 6, strokeWidth: 0 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
+
 
         {/* GOALS */}
         <div className="bg-white/20 dark:bg-white/10 backdrop-blur-lg
-          rounded-3xl p-6 shadow-xl mb-10">
-          <h2 className="text-xl font-bold mb-4">
+          rounded-[2rem] p-6 md:p-8 shadow-xl mb-10">
+          <h2 className="text-lg md:text-xl font-bold mb-6">
             Monthly Goals
           </h2>
           <Progress label="Reduce CO₂" percent={75} />
           <Progress label="Eco Routes Used" percent={60} />
           <Progress label="Night Safe Routes" percent={90} />
         </div>
+
 
         {/* TIP */}
         <div className="bg-white/20 dark:bg-white/10 backdrop-blur-lg
@@ -188,7 +190,7 @@ export default function EcoDashboard() {
           </p>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

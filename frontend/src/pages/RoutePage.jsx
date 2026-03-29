@@ -213,7 +213,7 @@ export default function RoutePage() {
 
   return (
     <div 
-      className="min-h-screen w-full px-6 py-10 relative overflow-hidden font-sans text-white"
+      className="min-h-screen w-full px-4 sm:px-6 md:px-10 py-6 md:py-10 relative overflow-hidden font-sans text-white"
       style={{
         background: "linear-gradient(135deg, #020617, #0f172a, #111827, #1e293b)",
       }}
@@ -252,11 +252,11 @@ export default function RoutePage() {
         initial={{ opacity: 0, y: 30 }} 
         animate={{ opacity: 1, y: 0 }} 
         transition={{ duration: 0.5 }}
-        className="max-w-4xl mx-auto mb-12 p-10 text-center relative z-10"
+        className="max-w-4xl mx-auto mb-16 p-8 md:p-12 text-center relative z-10"
         style={{
           background: "rgba(255, 255, 255, 0.05)",
           backdropFilter: "blur(20px)",
-          borderRadius: "20px",
+          borderRadius: "24px",
           border: "1px solid rgba(255, 255, 255, 0.1)",
           boxShadow: "0 20px 60px rgba(0,0,0,0.5)"
         }}
@@ -274,7 +274,7 @@ export default function RoutePage() {
         </div>
         
         <motion.h1 
-          className="text-4xl md:text-5xl font-bold mb-5 tracking-wide cursor-default group"
+          className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-5 tracking-wide cursor-default group"
           whileHover={{ scale: 1.02 }}
         >
           <span 
@@ -284,7 +284,7 @@ export default function RoutePage() {
             AI-Based Night Safety Score
           </span>
         </motion.h1>
-        <p className="text-lg mx-auto max-w-2xl text-white/80">
+        <p className="text-sm sm:text-base md:text-lg mx-auto max-w-2xl text-white/80 leading-relaxed">
           Predictive security dashboard powered by AI. We analyze streetlights, police proximity, historical incident datasets, and environmental factors to ensure your safety.
         </p>
       </motion.div>
@@ -294,15 +294,13 @@ export default function RoutePage() {
          initial={{ opacity: 0, y: 20 }} 
          animate={{ opacity: 1, y: 0 }} 
          transition={{ duration: 0.5, delay: 0.1 }}
-         className="max-w-2xl mx-auto mb-10 p-8 relative z-10 group transition-all duration-300 hover:-translate-y-[6px] overflow-hidden"
+         className="max-w-2xl mx-auto mb-20 p-8 relative z-10 group transition-all duration-300 hover:-translate-y-[6px]"
          style={{
            background: "rgba(255, 255, 255, 0.04)",
            backdropFilter: "blur(18px)",
            borderRadius: "18px",
            border: "1px solid rgba(255, 255, 255, 0.08)",
          }}
-         onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 15px 40px rgba(0,0,0,0.4)"; }}
-         onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "none"; }}
       >
         <AnimatePresence>
           {loading && <ScanningEffect />}
@@ -316,7 +314,7 @@ export default function RoutePage() {
           >
             <FaMapMarkerAlt className="inline mr-2 text-[#a78bfa]" />
           </motion.span>
-          Enter Location Context
+          Enter Trip Destination
         </label>
 
         <input
@@ -433,7 +431,7 @@ export default function RoutePage() {
               {/* VERDICT */}
               <motion.div 
                 whileHover={{ y: -5 }}
-                className={`${glassCardClass} p-8 col-span-1 md:col-span-1 group flex flex-col relative overflow-hidden`}
+                className={`${glassCardClass} p-10 col-span-1 md:col-span-1 group flex flex-col relative overflow-hidden h-full`}
               >
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <FaRobot className="text-6xl" />
@@ -442,7 +440,7 @@ export default function RoutePage() {
                   <motion.div animate={{ rotate: [0, 15, -15, 0] }} transition={{ repeat: Infinity, duration: 4 }}>
                     <FaRobot />
                   </motion.div>
-                   AI Verdict
+                   AI Safety Result
                 </h2>
                 <div className="flex-1 flex flex-col justify-center items-center text-center relative z-10">
                   <motion.span 
@@ -454,17 +452,17 @@ export default function RoutePage() {
                     {verdict.label}
                   </motion.span>
                   <p className="font-light text-sm mb-6 text-white/70">
-                    Calculated dynamically using real-time predictive modeling and local data streams.
+                    Calculated dynamically using real-time predictive modeling.
                   </p>
                   <button
                     onClick={() => speakSafetyStatus(safetyScore)}
-                    className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all duration-300 flex items-center justify-center gap-2 hover:scale-[1.02] hover:border-[#a78bfa]/50 group"
+                    className="w-full py-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all duration-300 flex items-center justify-center gap-2 hover:scale-[1.02] hover:border-[#a78bfa]/50 group"
                   >
                     <FaVolumeUp className="text-[#a78bfa] group-hover:scale-110" /> Hear Intelligence Alert
                   </button>
                   {lastChecked && (
-                    <span className="text-xs flex items-center gap-1 mt-4 text-white/50">
-                      <FaClock /> Synced: {lastChecked}
+                    <span className="text-xs flex items-center gap-1 mt-6 text-white/50">
+                      <FaClock /> Last Updated: {lastChecked}
                     </span>
                   )}
                 </div>
@@ -473,9 +471,9 @@ export default function RoutePage() {
               {/* FACTOR BARS */}
               <motion.div 
                 whileHover={{ y: -5 }}
-                className={`${glassCardClass} p-8 col-span-1 md:col-span-2`}
+                className={`${glassCardClass} p-6 md:p-8 col-span-1 md:col-span-2`}
               >
-                <h2 className="text-2xl font-bold mb-8 tracking-wide flex items-center gap-2 text-[#22d3ee]">
+                <h2 className="text-xl md:text-2xl font-bold mb-8 tracking-wide flex items-center gap-2 text-[#22d3ee]">
                   <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }}>
                     <FaShieldAlt />
                   </motion.div>
@@ -489,11 +487,11 @@ export default function RoutePage() {
                     ["Crowd Density & Sentiment", factors.women, "from-[#a78bfa] to-purple-500", <FaFemale />],
                   ].map(([label, value, gradient, icon], i) => (
                     <div key={i} className="group cursor-default">
-                      <div className="flex justify-between mb-2 text-sm font-medium text-white/80">
+                      <div className="flex justify-between mb-2 text-xs md:text-sm font-medium text-white/80">
                         <span className="flex items-center gap-2 group-hover:text-[#38bdf8] transition-colors">{icon} {label}</span>
                         <span className="font-bold">{value}%</span>
                       </div>
-                      <div className="w-full bg-[#0f172a] rounded-full h-3 border border-white/5 overflow-hidden">
+                      <div className="w-full bg-[#0f172a] rounded-full h-2.5 md:h-3 border border-white/5 overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${value}%` }}
@@ -528,12 +526,12 @@ export default function RoutePage() {
             <motion.div 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="bg-gradient-to-br from-[#4c0519] to-transparent backdrop-blur-xl border border-red-500/30 rounded-2xl p-8 shadow-[0_20px_50_rgba(225,29,72,0.15)] group transition-all duration-500"
+              className="bg-gradient-to-br from-[#4c0519] to-transparent backdrop-blur-xl border border-red-500/30 rounded-2xl p-6 md:p-8 shadow-[0_20px_50_rgba(225,29,72,0.15)] group transition-all duration-500"
             >
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-red-400 group-hover:text-red-300 transition-colors">
+              <h2 className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-3 text-red-400 group-hover:text-red-300 transition-colors">
                 <FaExclamationCircle className="animate-pulse" /> Emergency SOS Protocols
               </h2>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <motion.a
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   FiHome,
   FiPieChart,
@@ -9,28 +9,38 @@ import {
   FiUser,
   FiMoon,
   FiSun,
+  FiX,
+  FiActivity,
 } from "react-icons/fi";
 
-export default function Sidebar({ isDark, toggleTheme }) {
-  const [isHovered, setIsHovered] = useState(false);
+
+export default function Sidebar({ isDark, toggleTheme, isOpen, setIsOpen }) {
+  const location = useLocation();
 
   const navItems = [
     { name: "Home", path: "/", icon: FiHome },
     { name: "Dashboard", path: "/dashboard", icon: FiPieChart },
+    { name: "Eco Compare", path: "/route-comparison", icon: FiActivity },
+
     { name: "Comparison", path: "/comparison", icon: FiLayers },
+
     { name: "Route Safety", path: "/route", icon: FiMap },
     { name: "About", path: "/about", icon: FiInfo },
     { name: "Profile", path: "/profile", icon: FiUser },
   ];
 
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location, setIsOpen]);
+
   return (
     <aside
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className={`fixed top-0 left-0 h-screen z-50 
-        bg-white/20 dark:bg-[#0a0f18]/60 backdrop-blur-2xl border-r border-white/30 dark:border-white/5
+      className={`fixed top-0 left-0 h-full w-64 z-50 
+        bg-white/95 dark:bg-[#0a0f18]/95 backdrop-blur-2xl border-r border-white/30 dark:border-white/5
         transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] shadow-[0_0_40px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_rgba(0,0,0,0.5)]
-        ${isHovered ? "w-64" : "w-20"} flex flex-col`}
+        ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"} 
+        flex flex-col`}
     >
       {/* Logo Header */}
       <div className="flex items-center h-20 px-6 overflow-hidden shrink-0 mt-2">
@@ -38,11 +48,20 @@ export default function Sidebar({ isDark, toggleTheme }) {
           <span className="font-bold text-white leading-none">G</span>
         </div>
         <span 
-          className={`ml-4 text-xl font-bold bg-gradient-to-r from-cyan-600 to-purple-600 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent transition-opacity duration-300 whitespace-nowrap
-            ${isHovered ? "opacity-100" : "opacity-0"}`}
+          className="ml-4 text-xl font-bold bg-gradient-to-r from-cyan-600 to-purple-600 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent whitespace-nowrap"
         >
           Greenpath
         </span>
+
+        {/* Close button for mobile */}
+        {isOpen && (
+          <button 
+            onClick={() => setIsOpen(false)}
+            className="ml-auto lg:hidden p-2 text-gray-500 hover:text-cyan-500 transition-colors"
+          >
+            <FiX className="w-6 h-6" />
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -77,7 +96,6 @@ export default function Sidebar({ isDark, toggleTheme }) {
                 
                 <span 
                   className={`ml-4 font-medium transition-all duration-300 whitespace-nowrap
-                  ${isHovered ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"}
                   ${isActive ? "text-cyan-700 dark:text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.2)] dark:drop-shadow-[0_0_5px_rgba(34,211,238,0.4)]" : "text-gray-700 dark:text-gray-400 group-hover:text-purple-700 dark:group-hover:text-purple-400"}`}
                 >
                   {item.name}
@@ -101,8 +119,7 @@ export default function Sidebar({ isDark, toggleTheme }) {
           )}
           
           <span 
-            className={`ml-4 font-medium text-gray-700 dark:text-gray-400 whitespace-nowrap transition-all duration-300
-            ${isHovered ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"} group-hover:text-blue-600 dark:group-hover:text-yellow-400`}
+            className="ml-4 font-medium text-gray-700 dark:text-gray-400 whitespace-nowrap transition-all duration-300 group-hover:text-blue-600 dark:group-hover:text-yellow-400"
           >
             {isDark ? "Light Mode" : "Dark Mode"}
           </span>

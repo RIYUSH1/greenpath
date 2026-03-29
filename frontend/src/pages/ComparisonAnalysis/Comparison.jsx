@@ -539,7 +539,7 @@ export default function Comparison() {
   /* ===================== Render ===================== */
   return (
     <div 
-      className="min-h-screen text-white p-6 md:p-10 relative overflow-hidden font-sans"
+      className="min-h-screen text-white p-4 md:p-10 relative overflow-hidden font-sans"
       style={{
         background: 'linear-gradient(135deg, #0f172a, #111827, #1e293b, #020617)',
       }}
@@ -549,16 +549,16 @@ export default function Comparison() {
 
       <motion.div className="max-w-7xl mx-auto relative z-10" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}>
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
-          <div className="group cursor-pointer">
-            <h1 className="text-4xl md:text-5xl font-extrabold flex items-center gap-4 tracking-tight relative">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 md:mb-12 gap-6">
+          <div className="group cursor-pointer text-center md:text-left">
+            <h1 className="text-3xl md:text-5xl font-extrabold flex flex-col md:flex-row items-center gap-4 tracking-tight relative">
               <FaChartBar className="text-cyan-400 group-hover:rotate-12 transition-transform duration-300 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" /> 
               <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-sky-400 text-transparent bg-clip-text relative inline-block">
                 Route & Eco Comparison
                 <span className="absolute -bottom-2 left-0 w-0 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-500 rounded-full"></span>
               </span>
             </h1>
-            <p className="text-gray-400/80 mt-4 text-lg font-light">Compare two routes, see CO₂, live satellite + traffic, and AQI seamlessly.</p>
+            <p className="text-gray-400/80 mt-4 text-base md:text-lg font-light max-w-2xl">Compare two routes, see CO₂, live satellite + traffic, and AQI seamlessly.</p>
           </div>
 
           {/* small username control */}
@@ -580,24 +580,24 @@ export default function Comparison() {
 
         {/* Input Section */}
         <div 
-          className="p-8 rounded-[18px] shadow-[0_10px_30px_rgba(0,0,0,0.3)] mb-10 border border-white/10"
+          className="p-6 md:p-8 rounded-[18px] shadow-[0_10px_30px_rgba(0,0,0,0.3)] mb-10 border border-white/10"
           style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)' }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className="relative group/input">
-              <input value={origin} onChange={(e) => setOrigin(e.target.value)} placeholder="Origin (city or place)" className="w-full p-4 rounded-xl bg-[#0f172a]/50 border border-white/5 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none text-white placeholder-gray-500 transition-all duration-300" />
+              <input value={origin} onChange={(e) => setOrigin(e.target.value)} placeholder="Origin (city or place)" className="w-full p-4 rounded-xl bg-[#0f172a]/50 border border-white/5 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none text-white placeholder-gray-500 transition-all duration-300 text-sm md:text-base" />
             </div>
             <div className="relative group/input">
-              <input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Destination (city or place)" className="w-full p-4 rounded-xl bg-[#0f172a]/50 border border-white/5 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none text-white placeholder-gray-500 transition-all duration-300" />
+              <input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Destination (city or place)" className="w-full p-4 rounded-xl bg-[#0f172a]/50 border border-white/5 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none text-white placeholder-gray-500 transition-all duration-300 text-sm md:text-base" />
             </div>
-            <select value={modeA} onChange={(e) => setModeA(e.target.value)} className="w-full p-4 rounded-xl bg-[#0f172a]/50 border border-white/5 focus:border-purple-400/50 focus:ring-2 focus:ring-purple-400/20 focus:outline-none text-white transition-all duration-300 appearance-none">
+            <select value={modeA} onChange={(e) => setModeA(e.target.value)} className="w-full p-4 rounded-xl bg-[#0f172a]/50 border border-white/5 focus:border-purple-400/50 focus:ring-2 focus:ring-purple-400/20 focus:outline-none text-white transition-all duration-300 appearance-none text-sm md:text-base">
               <option value="car">Car</option>
               <option value="bus">Bus</option>
               <option value="train">Train</option>
               <option value="bicycle">Bicycle</option>
               <option value="walking">Walking</option>
             </select>
-            <select value={modeB} onChange={(e) => setModeB(e.target.value)} className="w-full p-4 rounded-xl bg-[#0f172a]/50 border border-white/5 focus:border-purple-400/50 focus:ring-2 focus:ring-purple-400/20 focus:outline-none text-white transition-all duration-300 appearance-none">
+            <select value={modeB} onChange={(e) => setModeB(e.target.value)} className="w-full p-4 rounded-xl bg-[#0f172a]/50 border border-white/5 focus:border-purple-400/50 focus:ring-2 focus:ring-purple-400/20 focus:outline-none text-white transition-all duration-300 appearance-none text-sm md:text-base">
               <option value="car">Car</option>
               <option value="bus">Bus</option>
               <option value="train">Train</option>
@@ -606,30 +606,33 @@ export default function Comparison() {
             </select>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <button 
-              disabled={loading} 
-              onClick={compare} 
-              className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-white shadow-[0_0_15px_rgba(6,182,212,0.4)] hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
-            >
-              {loading ? "Comparing Routes..." : "Compare Routes"}
-            </button>
-            <button
-              onClick={() => {
-                const o = origin;
-                setOrigin(destination);
-                setDestination(o);
-              }}
-              className="w-full sm:w-auto px-6 py-3.5 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 hover:scale-105 transition-all duration-300 font-medium"
-            >
-              Swap Points
-            </button>
+          <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+              <button 
+                disabled={loading} 
+                onClick={compare} 
+                className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-white shadow-[0_0_15px_rgba(6,182,212,0.4)] hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed text-sm md:text-base border border-cyan-400/20"
+              >
+                {loading ? "Comparing..." : "Compare Routes"}
+              </button>
+              <button
+                onClick={() => {
+                  const o = origin;
+                  setOrigin(destination);
+                  setDestination(o);
+                }}
+                className="w-full sm:w-auto px-6 py-3.5 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 hover:scale-105 transition-all duration-300 font-medium text-sm md:text-base"
+              >
+                Swap Points
+              </button>
+            </div>
 
-            <div className="ml-auto flex items-center gap-3">
-              <label className="text-sm text-gray-300">Show AQI components</label>
-              <input type="checkbox" checked={showComponents} onChange={() => setShowComponents(!showComponents)} className="scale-125" />
+            <div className="lg:ml-auto flex items-center justify-between lg:justify-end gap-3 w-full lg:w-auto p-4 lg:p-0 bg-white/5 lg:bg-transparent rounded-xl lg:rounded-none border border-white/10 lg:border-0 shadow-lg lg:shadow-none">
+              <label className="text-sm text-gray-300 font-medium">Show details</label>
+              <input type="checkbox" checked={showComponents} onChange={() => setShowComponents(!showComponents)} className="scale-150 cursor-pointer accent-cyan-500" />
             </div>
           </div>
+
           {mapError && <div className="text-red-300 mt-3">Map: {mapError}</div>}
         </div>
 
@@ -692,69 +695,70 @@ export default function Comparison() {
             <h3 className="text-2xl font-bold mb-6 flex items-center gap-3 text-white tracking-wide">
                <FaWind className="text-cyan-400" /> CO₂ Comparison & Savings
             </h3>
-            <div className="grid md:grid-cols-3 gap-6 mb-8 relative z-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 relative z-10">
               <div className="p-6 bg-[#0f172a]/80 backdrop-blur-md rounded-xl border border-white/5 hover:border-cyan-500/30 hover:shadow-[0_10px_30px_rgba(34,211,238,0.15)] transition-all duration-300 transform hover:-translate-y-1">
-                <strong className="block text-xl text-cyan-400 mb-4">{results.a.mode.toUpperCase()}</strong>
-                <div className="space-y-2 text-gray-300">
-                  <div className="flex justify-between"><span>Distance:</span> <span className="font-medium text-white">{results.a.distance_km} km</span></div>
-                  <div className="flex justify-between"><span>Time:</span> <span className="font-medium text-white">{formatDuration(results.a.duration_min * 60)}</span></div>
-                  <div className="flex justify-between"><span>CO₂:</span> <span className="font-medium text-white">{results.a.co2_kg} kg</span></div>
+                <strong className="block text-xl text-cyan-400 mb-4 uppercase tracking-tighter">{results.a.mode}</strong>
+                <div className="space-y-3 text-gray-300">
+                  <div className="flex justify-between text-sm"><span>Distance:</span> <span className="font-bold text-white tabular-nums">{results.a.distance_km} km</span></div>
+                  <div className="flex justify-between text-sm"><span>Time:</span> <span className="font-bold text-white tabular-nums">{formatDuration(results.a.duration_min * 60)}</span></div>
+                  <div className="flex justify-between text-sm"><span>CO₂:</span> <span className="font-bold text-white tabular-nums">{results.a.co2_kg} kg</span></div>
                 </div>
               </div>
 
               <div className="p-6 bg-[#0f172a]/80 backdrop-blur-md rounded-xl border border-white/5 hover:border-purple-500/30 hover:shadow-[0_10px_30px_rgba(168,85,247,0.15)] transition-all duration-300 transform hover:-translate-y-1">
-                <strong className="block text-xl text-purple-400 mb-4">{results.b.mode.toUpperCase()}</strong>
-                <div className="space-y-2 text-gray-300">
-                  <div className="flex justify-between"><span>Distance:</span> <span className="font-medium text-white">{results.b.distance_km} km</span></div>
-                  <div className="flex justify-between"><span>Time:</span> <span className="font-medium text-white">{formatDuration(results.b.duration_min * 60)}</span></div>
-                  <div className="flex justify-between"><span>CO₂:</span> <span className="font-medium text-white">{results.b.co2_kg} kg</span></div>
+                <strong className="block text-xl text-purple-400 mb-4 uppercase tracking-tighter">{results.b.mode}</strong>
+                <div className="space-y-3 text-gray-300">
+                  <div className="flex justify-between text-sm"><span>Distance:</span> <span className="font-bold text-white tabular-nums">{results.b.distance_km} km</span></div>
+                  <div className="flex justify-between text-sm"><span>Time:</span> <span className="font-bold text-white tabular-nums">{formatDuration(results.b.duration_min * 60)}</span></div>
+                  <div className="flex justify-between text-sm"><span>CO₂:</span> <span className="font-bold text-white tabular-nums">{results.b.co2_kg} kg</span></div>
                 </div>
               </div>
 
-              <div className="p-6 bg-gradient-to-br from-green-900/40 to-emerald-900/40 backdrop-blur-md rounded-xl border border-green-500/20 hover:border-emerald-500/50 hover:shadow-[0_10px_30px_rgba(16,185,129,0.2)] transition-all duration-300 transform hover:-translate-y-1">
-                <strong className="block text-xl text-emerald-400 mb-4 flex items-center gap-2"><FaTrophy /> Summary</strong>
-                <div className="space-y-3 text-gray-200">
-                  <div className="flex justify-between items-center bg-black/20 p-2 rounded-lg">
-                     <span>Greenest:</span> 
-                     <span className="font-bold text-emerald-300 px-3 py-1 bg-emerald-500/20 rounded-md">
-                        {results.a.co2_kg < results.b.co2_kg ? results.a.mode.toUpperCase() : results.b.mode.toUpperCase()}
+              <div className="p-6 bg-gradient-to-br from-green-900/40 to-emerald-900/40 backdrop-blur-md rounded-xl border border-green-500/20 hover:border-emerald-500/50 hover:shadow-[0_10px_30_rgba(16,185,129,0.2)] transition-all duration-300 transform hover:-translate-y-1 sm:col-span-2 lg:col-span-1">
+                <strong className="block text-xl text-emerald-400 mb-4 flex items-center gap-2 uppercase tracking-tighter"><FaTrophy /> Analysis Summary</strong>
+                <div className="space-y-4 text-gray-200">
+                  <div className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-white/5 shadow-inner">
+                     <span className="text-xs uppercase font-bold text-gray-400">Greenest Path:</span> 
+                     <span className="font-black text-emerald-300 px-3 py-1 bg-emerald-500/20 rounded-md text-xs uppercase shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+                        {results.a.co2_kg < results.b.co2_kg ? results.a.mode : results.b.mode}
                      </span>
                   </div>
-                  <div className="flex justify-between items-center bg-black/20 p-2 rounded-lg">
-                     <span>Fastest:</span> 
-                     <span className="font-bold text-blue-300 px-3 py-1 bg-blue-500/20 rounded-md">
-                        {results.a.duration_min < results.b.duration_min ? results.a.mode.toUpperCase() : results.b.mode.toUpperCase()}
+                  <div className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-white/5 shadow-inner">
+                     <span className="text-xs uppercase font-bold text-gray-400">Fastest Path:</span> 
+                     <span className="font-black text-blue-300 px-3 py-1 bg-blue-500/20 rounded-md text-xs uppercase shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                        {results.a.duration_min < results.b.duration_min ? results.a.mode : results.b.mode}
                      </span>
                   </div>
                 </div>
               </div>
             </div>
 
+
             {/* quick action: copy or create offset suggestion */}
-            <div className="flex items-center gap-4 relative z-10">
+            <div className="flex flex-col sm:flex-row items-center gap-4 relative z-10 w-full">
               <button
                 onClick={() => {
                   const text = `Comparing ${origin} → ${destination}: ${results.a.mode.toUpperCase()} ${results.a.co2_kg}kg vs ${results.b.mode.toUpperCase()} ${results.b.co2_kg}kg CO₂`;
                   navigator.clipboard?.writeText(text);
                 }}
-                className="px-6 py-2.5 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 transition-all duration-300 font-medium hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:-translate-y-0.5"
+                className="w-full sm:w-auto px-6 py-3 bg-white/5 border border-white/20 rounded-xl hover:bg-white/10 transition-all duration-300 font-medium hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:-translate-y-0.5 text-sm md:text-base cursor-pointer"
               >
                 Copy Summary
               </button>
 
               <button
                 onClick={() => {
-                  // generate a human-friendly offset suggestion
                   const green = results.a.co2_kg < results.b.co2_kg ? results.a : results.b;
                   const other = results.a.co2_kg < results.b.co2_kg ? results.b : results.a;
                   const saved = (other.co2_kg - green.co2_kg).toFixed(3);
                   alert(`If you choose ${green.mode.toUpperCase()} you save ~${saved} kg CO₂ for this trip. Consider planting a tree or donating to a verified carbon offset program.`);
                 }}
-                className="px-6 py-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-bold hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:-translate-y-0.5 flex items-center gap-2"
+                className="w-full sm:w-auto px-6 py-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl font-bold hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:-translate-y-0.5 flex items-center justify-center gap-2 text-sm md:text-base cursor-pointer"
               >
                 <FaLeaf /> Offset Suggestion
               </button>
             </div>
+
           </div>
         )}
 
@@ -809,8 +813,7 @@ export default function Comparison() {
         </h2>
         <div 
           ref={mapRef} 
-          style={{ height: "550px", width: "100%" }} 
-          className="mb-12 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden ring-1 ring-white/10 hover:ring-cyan-500/50 transition-all duration-500 bg-[#0f172a]/80 flex items-center justify-center"
+          className="mb-12 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden ring-1 ring-white/10 hover:ring-cyan-500/50 transition-all duration-500 bg-[#0f172a]/80 flex items-center justify-center min-h-[300px] h-[35vh] md:h-[550px] w-full"
         >
            {/* Loader if map is empty - purely visual fallback until google loads */}
            {!mapInstance.current && !results && <div className="text-gray-500 animate-pulse">Awaiting Route Data...</div>}
@@ -829,7 +832,7 @@ export default function Comparison() {
             <FaTrophy className="text-yellow-400 group-hover/board:rotate-12 group-hover/board:scale-110 transition-all duration-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]" /> Top Community Eco Heroes
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 mx-auto lg:grid-cols-3 gap-6 relative z-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
             {leaderboard.length === 0 ? (
               <div className="text-gray-400 col-span-full text-center py-10 bg-[#0f172a]/50 rounded-xl border border-white/5">No leaderboard data found. Complete a greener journey to place first!</div>
             ) : (
@@ -839,12 +842,12 @@ export default function Comparison() {
                   className="bg-[#0f172a]/60 backdrop-blur-md border border-white/5 rounded-xl p-6 flex flex-col items-center hover:bg-[#1e293b]/80 hover:-translate-y-2 hover:border-yellow-500/30 hover:shadow-[0_15px_30px_rgba(234,179,8,0.15)] transition-all duration-300"
                 >
                   <span className="text-5xl mb-4 drop-shadow-md">{index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `${index + 1}`}</span>
-                  <h3 className="text-xl font-bold text-white mb-1">{entry.user?.name || entry.name || "Unknown Hero"}</h3>
+                  <h3 className="text-xl font-bold text-white mb-1 text-center">{entry.user?.name || entry.name || "Unknown Hero"}</h3>
                   <p className="text-sm text-yellow-500 font-semibold uppercase tracking-wider mb-3">{Number(entry.ecoPoints || entry.points || 0).toFixed(2)} Points</p>
 
                   <div className="w-full h-px bg-white/10 my-2"></div>
 
-                  <p className="text-sm mt-2 font-bold text-gray-200">{entry.badge || computeBadgeFromPoints(entry.ecoPoints || entry.points || 0)}</p>
+                  <p className="text-sm mt-2 font-bold text-gray-200 text-center">{entry.badge || computeBadgeFromPoints(entry.ecoPoints || entry.points || 0)}</p>
                   <p className="text-xs text-gray-400 mt-1">{Number(entry.totalCO2Saved || entry.total_co2_saved || 0).toFixed(3)} kg CO₂ avoided</p>
                 </div>
               ))

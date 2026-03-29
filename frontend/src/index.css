@@ -1,7 +1,15 @@
 @import "tailwindcss";
-/* ===== DARK MODE COLORS ===== */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
 .dark body {
-  background-color: #022c22;
+  background-color: #020617;
   color: #f1f5f9;
 }
 
