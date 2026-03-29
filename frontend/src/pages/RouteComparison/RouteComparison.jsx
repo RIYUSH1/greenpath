@@ -16,6 +16,9 @@ import {
   FiShield
 } from "react-icons/fi";
 import { FaCar, FaBus, FaBicycle, FaWalking } from "react-icons/fa";
+import LoadingOverlay from "../../components/LoadingOverlay";
+import { useRef } from "react";
+
 
 // ================== REUSABLE UI COMPONENTS ==================
 
@@ -87,12 +90,36 @@ export default function RouteComparison() {
   const [destination, setDestination] = useState("");
   const [mode, setMode] = useState("car");
   const [loading, setLoading] = useState(true);
+  const [showWakingMessage, setShowWakingMessage] = useState(false);
+  const loadingTimerRef = useRef(null);
+
 
   useEffect(() => {
     // Simulate initial loading for "production" feel
-    const timer = setTimeout(() => setLoading(false), 1500);
+    const timer = setTimeout(() => {
+      setLoading(false);
+      setShowWakingMessage(false);
+    }, 1500);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleCompare = () => {
+     setLoading(true);
+     setShowWakingMessage(false);
+     
+     // Timer to show waking message
+     loadingTimerRef.current = setTimeout(() => {
+       setShowWakingMessage(true);
+     }, 4000);
+
+     // This would be your actual fetch, simulating for now
+     setTimeout(() => {
+        setLoading(false);
+        setShowWakingMessage(false);
+        if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
+     }, 3000); // Simulate response
+  };
+
 
   const transportModes = [
     { id: "car", icon: FaCar, label: "Car" },
@@ -103,6 +130,13 @@ export default function RouteComparison() {
 
   return (
     <div className="min-h-screen bg-transparent p-3 md:p-6 lg:p-10 text-white font-sans overflow-x-hidden">
+      {loading && (
+        <LoadingOverlay 
+          message={showWakingMessage ? "Starting AI Prediction..." : "Analyzing Travel Route..."} 
+          showWakingMessage={showWakingMessage} 
+        />
+      )}
+
       
       {/* HEADER & USER PROFILE SECTION */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
@@ -196,8 +230,10 @@ export default function RouteComparison() {
             <motion.button 
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              onClick={handleCompare}
               className="w-full py-4 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 hover:from-cyan-400 hover:via-blue-500 hover:to-purple-500 text-white font-black rounded-[1.2rem] shadow-2xl shadow-cyan-500/20 transition-all flex items-center justify-center gap-3 text-lg md:text-xl"
             >
+
               <FiActivity className="w-6 h-6" />
               Compare Routes
             </motion.button>

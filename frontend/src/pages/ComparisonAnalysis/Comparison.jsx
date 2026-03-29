@@ -10,6 +10,7 @@ import EcoPreferenceSelector from "../../components/EcoPreferenceSelector";
 import { getEcoPreferences } from "../../utils/ecoPreferences";
 import RouteMap from "../../components/RouteMap";
 import { API_BASE_URL } from "../../api/config";
+import LoadingOverlay from "../../components/LoadingOverlay";
 
 
 
@@ -190,6 +191,8 @@ export default function Comparison() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [username, setUsername] = useState(() => localStorage.getItem("ecoUserName") || "Riyush Kumar");
   const [ecoPrefs, setEcoPrefs] = useState(getEcoPreferences());
+  const [showWakingMessage, setShowWakingMessage] = useState(false);
+  const loadingTimerRef = useRef(null);
 
 
   // store full AQI objects returned by proxy
@@ -378,11 +381,16 @@ export default function Comparison() {
 
     setLoading(true);
     setResults(null);
-    setMapError(null);
-    setAqiOrigin(null);
     setAqiDest(null);
+    setShowWakingMessage(false);
+
+    // Set a timer to show "Waking Server" message after 5 seconds
+    loadingTimerRef.current = setTimeout(() => {
+      setShowWakingMessage(true);
+    }, 5000);
 
     try {
+
       // Call ORS backend for both modes to get distance/duration
       const [respA, respB] = await Promise.all([
         fetchRoutes(origin, destination, modeA),
@@ -454,8 +462,11 @@ export default function Comparison() {
       alert("Error while comparing routes — check console for details.");
     } finally {
       setLoading(false);
+      setShowWakingMessage(false);
+      if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
     }
   }
+
 
   /* ===================== Chart data (kept as before) ===================== */
   const transportData = {
@@ -539,11 +550,18 @@ export default function Comparison() {
   /* ===================== Render ===================== */
   return (
     <div 
-      className="min-h-screen text-white p-4 md:p-10 relative overflow-hidden font-sans"
+      className="min-h-screen text-white p-4 md:p-10 relative overflow-x-hidden font-sans"
       style={{
         background: 'linear-gradient(135deg, #0f172a, #111827, #1e293b, #020617)',
       }}
     >
+      {loading && (
+        <LoadingOverlay 
+          message={showWakingMessage ? "Waking Up Render Servers..." : "Comparing Routes..."} 
+          showWakingMessage={showWakingMessage} 
+        />
+      )}
+
       {/* Subtle radial highlight */}
       <div className="absolute top-0 right-0 w-[800px] h-[800px] pointer-events-none" style={{ background: 'radial-gradient(circle at top right, rgba(56,189,248,0.15), transparent 70%)' }}></div>
 

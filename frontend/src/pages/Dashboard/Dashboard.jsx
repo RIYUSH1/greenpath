@@ -18,6 +18,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import LoadingOverlay from "../../components/LoadingOverlay";
+import { useRef } from "react";
+
 
 /* ================= MOCK API ================= */
 
@@ -88,27 +91,42 @@ function Confetti() {
 export default function EcoDashboard() {
   const [data, setData] = useState(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showWakingMessage, setShowWakingMessage] = useState(false);
+  const loadingTimerRef = useRef(null);
+
 
   useEffect(() => {
+    setShowWakingMessage(false);
+    loadingTimerRef.current = setTimeout(() => {
+      setShowWakingMessage(true);
+    }, 5000);
+
     fetchEcoData().then((res) => {
       setData(res);
+      setShowWakingMessage(false);
+      if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
+
       if (res.streak >= 7) {
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 3000);
       }
     });
+
+    return () => {
+      if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
+    };
   }, []);
+
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-emerald-500 font-bold">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-          Loading Eco Dashboard...
-        </div>
-      </div>
+      <LoadingOverlay 
+        message={showWakingMessage ? "Waking Server... Preparing Dashboard" : "Syncing Sustainability Data..."} 
+        showWakingMessage={showWakingMessage} 
+      />
     );
   }
+
 
   return (
     <>
