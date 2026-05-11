@@ -35,14 +35,14 @@ router.post("/predict", async (req, res) => {
     if (nearestPoints.length === 0) {
         // Fallback for isolated locations
         return res.json({
-            score: (Math.random() * 3 + 5).toFixed(1), // generic safe score
+            safetyScore: parseFloat((Math.random() * 3 + 5).toFixed(1)), // generic safe score
+            coordinates: [lng, lat],
             factors: {
                 streetlight: 75,
                 police: 1.8,
                 accident: 15,
                 women: 85
             },
-            coords: { lat, lng },
             method: "Generic AI Model"
         });
     }
@@ -61,14 +61,14 @@ router.post("/predict", async (req, res) => {
 
     const count = nearestPoints.length;
     return res.json({
-        score: (totalScore / count).toFixed(1),
+        safetyScore: parseFloat((totalScore / count).toFixed(1)),
+        coordinates: [lng, lat],
         factors: {
             streetlight: Math.round(factors.streetlight / count),
             police: parseFloat((factors.police / count).toFixed(2)),
             accident: Math.round(factors.accident / count),
             women: Math.round(factors.women / count)
         },
-        coords: { lat, lng },
         method: "Predictive AI Engine (1,000 Trained Datasets)"
     });
 

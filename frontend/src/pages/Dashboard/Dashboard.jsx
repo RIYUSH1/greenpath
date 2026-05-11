@@ -24,6 +24,8 @@ import { nodeClient } from "../../api/apiClient";
 
 
 
+import CO2TrackerUI from "./CO2TrackerUI";
+
 /* ================= MOCK API ================= */
 
 /* ================= API FETCH ================= */
@@ -93,6 +95,7 @@ export default function EcoDashboard() {
   const [data, setData] = useState(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showWakingMessage, setShowWakingMessage] = useState(false);
+  const [viewMode, setViewMode] = useState("main"); // "main" or "co2"
   const loadingTimerRef = useRef(null);
 
 
@@ -137,11 +140,33 @@ export default function EcoDashboard() {
         bg-transparent text-gray-900 dark:text-white px-4 md:px-6 py-6 md:py-8">
 
         {/* HEADER */}
-        <div className="flex justify-between items-center mb-6 md:mb-10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-10 gap-4">
           <h1 className="text-xl md:text-3xl font-extrabold flex items-center gap-2">
             🌱 Eco Dashboard
           </h1>
+          
+          <div className="flex bg-white/20 p-1 rounded-xl backdrop-blur-sm border border-white/30">
+            <button 
+              onClick={() => setViewMode("main")}
+              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${viewMode === "main" ? "bg-emerald-500 text-white shadow-lg" : "text-gray-600 hover:bg-white/10"}`}
+            >
+              Overview
+            </button>
+            <button 
+              onClick={() => setViewMode("co2")}
+              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${viewMode === "co2" ? "bg-emerald-500 text-white shadow-lg" : "text-gray-600 hover:bg-white/10"}`}
+            >
+              CO2 Tracker
+            </button>
+          </div>
         </div>
+
+        {viewMode === "co2" ? (
+          <div className="flex justify-center py-4">
+            <CO2TrackerUI />
+          </div>
+        ) : (
+          <>
 
 
         {/* STATS */}
@@ -208,8 +233,10 @@ export default function EcoDashboard() {
             fuel usage.
           </p>
         </div>
-      </div>
-    </>
+      </>
+    )}
+  </div>
+</>
   );
 }
 

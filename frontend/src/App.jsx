@@ -3,103 +3,97 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
+  useLocation,
 } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 
 // ================== PAGES ==================
+import Intro from "./pages/Intro";
 import Home from "./pages/Home/Home";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard/Dashboard";
-import Comparison from "./pages/ComparisonAnalysis/Comparison";
+import Comparison from "./pages/Comparison";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
 import RoutePage from "./pages/RoutePage";
 import RouteComparison from "./pages/RouteComparison/RouteComparison";
+import RouteSafety from "./pages/RouteSafety";
 
+import Navbar from "./components/Navbar";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { auth } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { Navigate } from "react-router-dom";
 
-// ================== INTRO ==================
-import Intro from "./components/Intro";
-import Sidebar from "./components/Sidebar";
-
-export default function App() {
-  const [showIntro, setShowIntro] = useState(
-    !localStorage.getItem("introSeen")
-  );
-
-  const [isDark, setIsDark] = useState(
-    localStorage.getItem("theme") === "dark" || true // Defaulting to dark for modern SaaS feel
-  );
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  }, [isDark]);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
-  const finishIntro = () => {
-    localStorage.setItem("introSeen", "true");
-    setShowIntro(false);
-  };
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" />;
+  return children;
+};
 
-  if (showIntro) {
-    return <Intro onFinish={finishIntro} />;
-  }
+function AppContent() {
+  const [isDark, setIsDark] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    document.documentElement.classList.remove("dark");
+    localStorage.setItem("theme", "light");
+  }, []);
 
   return (
-    <Router>
-      <div className={`flex min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100 dark:from-[#0a0f18] dark:via-[#111827] dark:to-[#0d1627] text-gray-900 dark:text-gray-100 transition-colors duration-700 overflow-x-hidden`}>
-        
-        {/* SIDEBAR COMPONENT */}
-        <Sidebar 
-          isDark={isDark} 
-          toggleTheme={() => setIsDark(!isDark)} 
-          isOpen={isSidebarOpen}
-          setIsOpen={setIsSidebarOpen}
-        />
+    <div className="bg-[#F8FAFC] min-h-screen text-[#0F172A] font-sans selection:bg-green-100 transition-colors duration-500">
+      {/* TOP NAVBAR */}
+      <Navbar />
 
-        {/* MOBILE OVERLAY */}
-        {isSidebarOpen && (
-          <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
-
-        {/* MAIN CONTENT */}
-        <main className="flex-1 flex flex-col min-w-0 transition-all duration-300 lg:ml-64">
-          {/* MOBILE NAVBAR */}
-          <header className="lg:hidden flex items-center justify-between p-4 sticky top-0 z-30 bg-white/10 dark:bg-black/80 backdrop-blur-lg border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-purple-600 flex items-center justify-center">
-                <span className="font-bold text-white text-xs">G</span>
-              </div>
-              <span className="font-bold text-lg bg-gradient-to-r from-cyan-600 to-purple-600 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
-                Greenpath
-              </span>
-            </div>
-            <button 
-              onClick={() => setIsSidebarOpen(true)}
-              className="p-2 rounded-xl bg-white/5"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-              </svg>
-            </button>
-          </header>
-
-          <div className="flex-1 w-full max-w-full overflow-x-hidden">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+      {/* MAIN CONTENT WRAPPER */}
+      <div className="pt-20 px-6 max-w-7xl mx-auto">
+        <ErrorBoundary>
+          <AnimatePresence mode="wait">
+            <Routes key={location.pathname} location={location}>
+              {/* Intro Page Route */}
+              <Route path="/" element={<Intro />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/comparison" element={<Comparison />} />
               <Route path="/route" element={<RoutePage />} />
               <Route path="/route-comparison" element={<RouteComparison />} />
-
+              <Route path="/route-safety" element={<RouteSafety />} />
               <Route path="/about" element={<About />} />
               <Route path="/profile" element={<Profile />} />
+              
+              {/* Fallback */}
+              <Route path="*" element={<Home />} />
             </Routes>
-          </div>
-        </main>
+          </AnimatePresence>
+        </ErrorBoundary>
       </div>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
+
+
+
+

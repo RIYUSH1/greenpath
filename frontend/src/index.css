@@ -8,19 +8,22 @@ html, body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+body {
+  background-color: #F8FAFC;
+  color: #0F172A;
+}
+
 .dark body {
-  background-color: #020617;
-  color: #f1f5f9;
+  background-color: #F8FAFC;
+  color: #0F172A;
 }
 
-.dark h1,
-.dark h2,
-.dark h3 {
-  color: #a7f3d0;
+h1, h2, h3, h4 {
+  color: #0F172A;
 }
 
-.dark p {
-  color: #d1fae5;
+p {
+  color: #475569;
 }
 
 /* ===== GREENPATH MAP GLOW ===== */
@@ -84,6 +87,28 @@ html, body {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* ===== ANIMATED GRADIENT TEXT ===== */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% auto;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* ===== FLOATING ANIMATION ===== */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
 }
 
 .dark .glassmorphism {

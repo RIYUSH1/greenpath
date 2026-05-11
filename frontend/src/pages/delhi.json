@@ -1,0 +1,10 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Delhi Connection Hub" },
+      "geometry": { "type": "Point", "coordinates": [77.2090, 28.6139] }
+    }
+  ]
+}

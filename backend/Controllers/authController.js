@@ -16,14 +16,41 @@ const registerUser = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-    res.status(201).json({ user, token });
+    res.status(201).json({ user: { id: user._id, name: user.name, email: user.email }, token });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error registering user' });
   }
 };
 
-const loginUser = async (req, res) => { /* similar structure */ };
-const getUserProfile = async (req, res) => { /* similar structure */ };
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ error: 'All fields are required.' });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ error: 'Invalid credentials.' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ error: 'Invalid credentials.' });
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    res.json({ user: { id: user._id, name: user.name, email: user.email }, token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error logging in' });
+  }
+};
+
+const getUserProfile = async (req, res) => {
+  try {
+    // req.user is populated by authMiddleware
+    res.json(req.user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error fetching profile' });
+  }
+};
 
 module.exports = { registerUser, loginUser, getUserProfile };

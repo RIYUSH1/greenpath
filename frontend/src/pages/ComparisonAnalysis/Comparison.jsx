@@ -4,11 +4,10 @@ import { motion } from "framer-motion";
 import { Bar, Radar, Line } from "react-chartjs-2";
 import "chart.js/auto";
 import axios from "axios";
-import { FaTrophy, FaLeaf, FaChartBar, FaUser, FaWind, FaMapMarkedAlt, FaLeaf as LeafIcon } from "react-icons/fa";
+import { FaTrophy, FaLeaf, FaChartBar, FaUser, FaWind, FaMapMarkedAlt, FaLeaf as LeafIcon, FaMapPin, FaRoute, FaExternalLinkAlt } from "react-icons/fa";
 import fetchAQIProxy from "../../utils/fetchAQI_via_proxy";
 import EcoPreferenceSelector from "../../components/EcoPreferenceSelector";
 import { getEcoPreferences } from "../../utils/ecoPreferences";
-import RouteMap from "../../components/RouteMap";
 import { nodeClient } from "../../api/apiClient";
 import LoadingOverlay from "../../components/LoadingOverlay";
 
@@ -208,6 +207,34 @@ export default function Comparison() {
   // small UX toggles
   const [showComponents, setShowComponents] = useState(true);
   const [showAQIChart, setShowAQIChart] = useState(true);
+
+  // Hybrid Routing State
+  const [hybridSource, setHybridSource] = useState("");
+  const [hybridDest, setHybridDest] = useState("");
+  const [isHybridComparing, setIsHybridComparing] = useState(false);
+  const [hybridResults, setHybridResults] = useState(null);
+
+  const handleHybridCompare = () => {
+    if (!hybridSource || !hybridDest) return alert("Please enter source & destination");
+    setIsHybridComparing(true);
+    setHybridResults(null);
+    
+    // Mock distance simulation
+    const dA = Math.floor(Math.random() * 200) + 1200; 
+    const dB = dA + Math.floor(Math.random() * 100) + 50;
+
+    setTimeout(() => {
+      const urlA = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(hybridSource)}&destination=${encodeURIComponent(hybridDest)}&travelmode=driving`;
+      const urlB = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(hybridSource)}&destination=${encodeURIComponent(hybridDest)}&waypoints=${encodeURIComponent(hybridDest)}&travelmode=driving`;
+      
+      setHybridResults({ distA: dA, distB: dB });
+      setIsHybridComparing(false);
+
+      // Instant redirection
+      window.open(urlA, '_blank');
+      window.open(urlB, '_blank');
+    }, 1000);
+  };
 
   useEffect(() => {
     // initial fetch of leaderboard (if any)
@@ -461,6 +488,14 @@ export default function Comparison() {
 
       // Draw both routes on a single Google map (satellite + traffic)
       await drawTwoRoutesOnMap(origin, destination, modeA, modeB);
+
+      // Auto-scroll to map (Step 2)
+      setTimeout(() => {
+        const mapEl = document.getElementById("comparison-map");
+        if (mapEl) {
+          mapEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 500);
     } catch (err) {
       console.error("Compare error:", err);
       alert("Error while comparing routes — check console for details.");
@@ -830,15 +865,75 @@ export default function Comparison() {
         )}
 
         {/* Map */}
-        <h2 className="text-2xl font-bold mb-6 text-white tracking-wide flex items-center gap-3">
-           <FaMapMarkedAlt className="text-cyan-400" /> Live Hybrid Routing Base
-        </h2>
-        <div 
-          ref={mapRef} 
-          className="mb-12 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden ring-1 ring-white/10 hover:ring-cyan-500/50 transition-all duration-500 bg-[#0f172a]/80 flex items-center justify-center min-h-[300px] h-[35vh] md:h-[550px] w-full"
-        >
-           {/* Loader if map is empty - purely visual fallback until google loads */}
-           {!mapInstance.current && !results && <div className="text-gray-500 animate-pulse">Awaiting Route Data...</div>}
+        <div id="comparison-map" className="bg-white/5 backdrop-blur-xl p-6 md:p-8 rounded-[2rem] border border-white/10 mb-12 shadow-2xl overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 relative z-10">
+            <div className="space-y-3">
+              <label className="text-xs font-black uppercase tracking-widest text-gray-500 ml-1">Starting Point</label>
+              <div className="relative">
+                <FaMapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400" />
+                <input 
+                  type="text" 
+                  value={hybridSource}
+                  onChange={(e) => setHybridSource(e.target.value)}
+                  placeholder="Street, City or Landmark"
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all placeholder-gray-600"
+                />
+              </div>
+            </div>
+            <div className="space-y-3">
+              <label className="text-xs font-black uppercase tracking-widest text-gray-500 ml-1">Destination</label>
+              <div className="relative">
+                <FaRoute className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400" />
+                <input 
+                  type="text" 
+                  value={hybridDest}
+                  onChange={(e) => setHybridDest(e.target.value)}
+                  placeholder="Where to?"
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all placeholder-gray-600"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center mb-6 relative z-10">
+            <motion.button 
+              whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(6,182,212,0.3)" }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleHybridCompare}
+              disabled={isHybridComparing}
+              className="px-12 py-4 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 text-white font-black rounded-2xl shadow-xl transition-all flex items-center gap-3 disabled:opacity-50 uppercase tracking-widest text-sm"
+            >
+              {isHybridComparing ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : <FaMapMarkedAlt />}
+              {isHybridComparing ? "Fetching Paths..." : "Compare Routes"}
+            </motion.button>
+
+            {/* Distance Summary Inline */}
+            {hybridResults && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 flex gap-8 p-4 bg-white/5 rounded-2xl border border-white/10"
+              >
+                <div className="text-center">
+                  <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">Route A</p>
+                  <p className="text-xl font-black text-cyan-400">{hybridResults.distA} km</p>
+                </div>
+                <div className="w-px h-10 bg-white/10" />
+                <div className="text-center">
+                  <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">Route B</p>
+                  <p className="text-xl font-black text-purple-400">{hybridResults.distB} km</p>
+                </div>
+              </motion.div>
+            )}
+
+            {isHybridComparing && (
+              <p className="text-xs text-gray-500 font-bold uppercase tracking-[0.2em] mt-4 animate-pulse">Redirecting to Google Maps...</p>
+            )}
+          </div>
         </div>
 
         {/* Leaderboard Section (dynamic) */}

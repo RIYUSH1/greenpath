@@ -18,13 +18,13 @@ export default function Sidebar({ isDark, toggleTheme, isOpen, setIsOpen }) {
   const location = useLocation();
 
   const navItems = [
-    { name: "Home", path: "/", icon: FiHome },
+    { name: "Home", path: "/home", icon: FiHome },
     { name: "Dashboard", path: "/dashboard", icon: FiPieChart },
     { name: "Eco Compare", path: "/route-comparison", icon: FiActivity },
 
     { name: "Comparison", path: "/comparison", icon: FiLayers },
 
-    { name: "Route Safety", path: "/route", icon: FiMap },
+    { name: "Route Safety", path: "/route-safety", icon: FiMap },
     { name: "About", path: "/about", icon: FiInfo },
     { name: "Profile", path: "/profile", icon: FiUser },
   ];

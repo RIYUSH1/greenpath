@@ -1,0 +1,10 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Noida Perimeter" },
+      "geometry": { "type": "Point", "coordinates": [77.3910, 28.5355] }
+    }
+  ]
+}

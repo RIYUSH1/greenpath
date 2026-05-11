@@ -62,14 +62,17 @@ def test():
 @app.route("/api/night-safety", methods=["POST"])
 def night_safety():
     data = request.json or {}
+    lat = data.get("lat")
+    lng = data.get("lng")
     place = data.get("place")
 
-    if not place:
-        return jsonify({"error": "Place required"}), 400
+    if (lat is None or lng is None) and not place:
+        return jsonify({"error": "Place or coordinates required"}), 400
 
-    lat, lng = geocode_place(place)
-    if lat is None:
-        return jsonify({"error": "Invalid place"}), 400
+    if lat is None or lng is None:
+        lat, lng = geocode_place(place)
+        if lat is None:
+            return jsonify({"error": "Invalid place"}), 400
 
     police_distance = get_nearest_police_distance(lat, lng)
     accidents = get_accident_count(lat, lng)
@@ -86,7 +89,7 @@ def night_safety():
         0.25 * (1 - min(accidents / 10, 1)) +
         0.2 * (1 if police_distance and police_distance < 1000 else 0.4) +
         0.25 * (women_rating / 5)
-    ) * 10, 2)
+    ) * 100, 2)
 
     # AI prediction
     ai_pred = model.predict([[
@@ -102,8 +105,49 @@ def night_safety():
 
     return jsonify({
         "score": score,
-        "ai_label": ai_label
+        "ai_label": ai_label,
+        "lat": lat,
+        "lng": lng
     })
+
+# =====================================================
+# BULK NIGHT SAFETY SCORE API
+# =====================================================
+@app.route("/api/bulk-night-safety", methods=["POST"])
+def bulk_night_safety():
+    data = request.json or {}
+    routes_coords = data.get("routes", []) # List of lists of [lng, lat]
+
+    if not routes_coords:
+        return jsonify({"error": "No routes provided"}), 400
+
+    results = []
+    for coordinates in routes_coords:
+        # Sample points from the route to score
+        sample_size = 5
+        step = max(1, len(coordinates) // sample_size)
+        sampled = coordinates[::step][:sample_size]
+        
+        scores = []
+        for lng, lat in sampled:
+            police_distance = get_nearest_police_distance(lat, lng)
+            accidents = get_accident_count(lat, lng)
+            street_data = get_streetlight_density(lat, lng)
+            street_density = street_data.get("density", 0)
+            women_rating = 4.2
+
+            score = round((
+                0.3 * min(street_density / 30, 1) +
+                0.25 * (1 - min(accidents / 10, 1)) +
+                0.2 * (1 if police_distance and police_distance < 1000 else 0.4) +
+                0.25 * (women_rating / 5)
+            ) * 100, 2)
+            scores.append(score)
+        
+        avg_score = sum(scores) / len(scores) if scores else 50
+        results.append(avg_score)
+
+    return jsonify({"scores": results})
 
 # =====================================================
 # 🔥 HEATMAP FEATURE
@@ -173,4 +217,4 @@ def night_safety_heatmap():
 # RUN SERVER
 # =====================================================
 if __name__ == "__main__":
-    app.run(port=5000, debug=False, use_reloader=False)
+    app.run(port=8000, debug=False, use_reloader=False)

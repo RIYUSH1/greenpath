@@ -44,9 +44,13 @@ const geocodePlace = async (place) => {
   const r = await axios.get(
     "https://api.openrouteservice.org/geocode/search",
     {
-      params: { text: place, size: 1 },
+      params: { 
+        text: place, 
+        size: 1,
+        api_key: ORS_API_KEY
+      },
       headers: { Authorization: ORS_API_KEY },
-      timeout: 8000,
+      timeout: 10000,
     }
   );
 

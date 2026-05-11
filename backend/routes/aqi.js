@@ -3,36 +3,45 @@ const express = require("express");
 const axios = require("axios");
 const router = express.Router();
 
+function getAQICategory(aqi) {
+  if (aqi <= 50) return "Good";
+  if (aqi <= 100) return "Moderate";
+  if (aqi <= 150) return "Unhealthy for Sensitive Groups";
+  if (aqi <= 200) return "Poor";
+  if (aqi <= 300) return "Very Poor";
+  return "Hazardous";
+}
+
 router.get("/city", async (req, res) => {
+  const { city } = req.query;
+  if (!city) return res.status(400).json({ error: "Missing city query parameter" });
+
   try {
-    const { city } = req.query;
-    const API_KEY = process.env.OPENWEATHER_KEY;
-    if (!API_KEY) return res.status(500).json({ error: "OPENWEATHER_KEY not set on server" });
-    if (!city) return res.status(400).json({ error: "Missing city query parameter" });
+    const API_KEY = process.env.WAQI_API_KEY || process.env.OPENWEATHER_KEY || "demo";
 
-    // 1) Geocode
-    const geo = await axios.get("https://api.openweathermap.org/geo/1.0/direct", {
-      params: { q: city, limit: 1, appid: API_KEY },
-    });
-    if (!geo.data || !geo.data[0]) return res.status(404).json({ error: "Location not found" });
+    // 1) Fetch Air quality using WAQI API
+    const waqiUrl = `https://api.waqi.info/feed/${encodeURIComponent(city)}/?token=${API_KEY}`;
+    const response = await axios.get(waqiUrl, { timeout: 5000 });
 
-    const { lat, lon } = geo.data[0];
+    console.log(`[AQI Route] Real WAQI API response for ${city}:`, response.data);
 
-    // 2) Air pollution
-    const aqiRes = await axios.get("https://api.openweathermap.org/data/2.5/air_pollution", {
-      params: { lat, lon, appid: API_KEY },
-    });
+    if (response.data && response.data.status === "ok") {
+      const aqi = response.data.data.aqi;
+      return res.json({
+        city: response.data.data.city.name || city,
+        aqi: aqi,
+        category: getAQICategory(aqi),
+        timestamp: response.data.data.time?.s || new Date().toISOString()
+      });
+    } else {
+      // API responded but status not ok (e.g., unknown city)
+      console.warn(`[AQI Route] WAQI API issue for ${city}:`, response.data);
+      return res.status(404).json({ error: true, message: response.data?.data || "AQI data unavailable for this city" });
+    }
 
-    const item = aqiRes.data?.list?.[0] || null;
-    return res.json({
-      lat,
-      lon,
-      aqi: item?.main?.aqi ?? null,
-      components: item?.components ?? null,
-    });
   } catch (err) {
-    console.error("AQI proxy error:", err?.response?.data || err.message || err);
-    return res.status(500).json({ error: "Failed to fetch AQI" });
+    console.error("[AQI Route] AQI proxy error:", err?.response?.data || err.message || err);
+    return res.status(500).json({ error: true, message: "Failed to fetch AQI data" });
   }
 });
 

@@ -18,7 +18,8 @@ import {
 // ================= IMPORT AI COMPONENTS =================
 import NightSafety from "../components/NightSafety";
 import SafetyScoreMeter from "../components/SafetyScoreMeter";
-import MapPreview from "../components/MapPreview";
+import SafetyMap from "../components/SafetyMap";
+import RouteSafetyMap from "../components/RouteSafetyMap";
 import { API_BASE_URL } from "../api/config";
 
 
@@ -152,34 +153,47 @@ export default function RoutePage() {
     setLoading(true);
     setShowResult(true);
 
+    // Auto-scroll to map (Step 2)
+    setTimeout(() => {
+      const mapEl = document.getElementById("map-container");
+      if (mapEl) {
+        mapEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
+
     try {
       // Calling our newly trained AI predictive model on the backend
       const response = await axios.post(`${API_BASE_URL}/api/safety/predict`, { location: place });
       const data = response.data;
       
       // Update UI with real "trained" data
-      setSafetyScore(Number(data.score));
+      setSafetyScore(data.safetyScore);
       setFactors({
-        streetlight: data.factors.streetlight,
+         streetlight: data.factors.streetlight,
         police: Math.round(((5 - data.factors.police) / 5) * 100), // convert km proximity to relevance %
         accident: data.factors.accident,
         women: data.factors.women,
       });
 
       // Sync map coordinates
-      if (data.coords) {
-         setRouteLocation({ lat: data.coords.lat, lng: data.coords.lng });
+      if (data.coordinates) {
+         setRouteLocation({ lng: data.coordinates[0], lat: data.coordinates[1] });
       }
 
       setLastChecked(new Date().toLocaleTimeString());
       setLoading(false);
 
       // AI Voice feedback
-      speakSafetyStatus(data.score);
+      speakSafetyStatus(data.safetyScore);
 
     } catch (error) {
       console.error("AI Safety Engine Error:", error);
       
+      // Fallback message for user
+      if (error.message === "Network Error" || !error.response) {
+        alert("Server not running. Please start backend on port 5000.");
+      }
+
       // Fallback to simulation if backend is unreachable
       setTimeout(() => {
         const simulatedScore = Number((Math.random() * 10).toFixed(1));
@@ -193,9 +207,32 @@ export default function RoutePage() {
         setLastChecked(new Date().toLocaleTimeString());
         setLoading(false);
         speakSafetyStatus(simulatedScore);
-      }, 3000);
+      }, 1000);
     }
   };
+
+  // =====================================================
+  // LIVE GEOCODING (FOR REAL-TIME MAP UPDATES)
+  // =====================================================
+  useEffect(() => {
+    if (!place.trim()) return;
+
+    const delayDebounceFn = setTimeout(async () => {
+      try {
+        const response = await axios.post(`${API_BASE_URL}/api/safety/predict`, { location: place });
+        if (response.data.coordinates) {
+          setRouteLocation({ 
+            lng: response.data.coordinates[0], 
+            lat: response.data.coordinates[1] 
+          });
+        }
+      } catch (error) {
+        console.error("Live geocoding error:", error);
+      }
+    }, 1000); // 1 second debounce
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [place]);
 
   // =====================================================
   // AI VERDICT LOGIC
@@ -389,7 +426,24 @@ export default function RoutePage() {
         ))}
       </motion.div>
 
-      {/* ================= RESULTS ================= */}
+      {/* ================= MAP SECTION (ALWAYS VISIBLE) ================= */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="max-w-6xl mx-auto mb-12 px-4 relative z-10"
+      >
+        <div className={`${glassCardClass} p-6 md:p-8`}>
+          <h3 className="text-xl md:text-2xl font-bold text-[#38bdf8] mb-6 flex items-center gap-2">
+            <FaMapMarkerAlt /> {showResult ? "Safe Route Comparison Engine" : "Real-time Location Preview"}
+          </h3>
+          <RouteSafetyMap 
+            destination={{ lat: routeLocation.lat, lng: routeLocation.lng }} 
+            showRoutes={showResult}
+          />
+        </div>
+      </motion.div>
+
       <AnimatePresence>
         {showResult && (
           <motion.div 
@@ -407,24 +461,9 @@ export default function RoutePage() {
               </motion.div>
             )}
 
-            {/* SCORE + MAP */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <motion.div 
-                whileHover={{ scale: 1.01 }}
-                className="transition-transform duration-300"
-              >
+            {/* SCORE METER */}
+            <div className="max-w-xl mx-auto">
                 <SafetyScoreMeter score={safetyScore} />
-              </motion.div>
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                whileHover={{ scale: 1.01 }}
-                className="relative group transition-transform duration-300"
-              >
-                <div className="absolute inset-0 bg-[#38bdf8]/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                <MapPreview lat={routeLocation.lat} lng={routeLocation.lng} />
-              </motion.div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

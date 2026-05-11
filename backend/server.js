@@ -26,6 +26,8 @@ const leaderboardRoutes = require("./routes/leaderboard");
 // ✅ NEW: AQI proxy route
 const aqiRoutes = require("./routes/aqi");
 const safetyRoutes = require("./routes/safety");
+const routeProxyRoutes = require("./routes/route_proxy");
+const nightSafetyRoutes = require("./routes/nightSafety.routes.js");
 
 // ✅ MongoDB Connect
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/greenpath";
@@ -49,7 +51,7 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 
-// ✅ API Routes
+app.use("/api/night-safety", nightSafetyRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/trips", tripsRoutes);
@@ -61,8 +63,8 @@ app.use("/api/external", orsRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 
 // ✅ NEW: AQI proxy mount
+app.use("/api/route", routeProxyRoutes);
 app.use("/api/aqi", aqiRoutes);
-app.use("/api/safety", safetyRoutes);
 
 // ✅ Health Check Route
 app.get("/api/health", (req, res) =>
@@ -94,6 +96,25 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-// ✅ Start Server
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// ✅ Start Server (with Auto-Port Fallback)
+const INITIAL_PORT = process.env.PORT || 5000;
+
+function startServer(port) {
+  server.listen(port)
+    .on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        const nextPort = Number(port) + 1;
+        console.log(`⚠️  Port ${port} is occupied. Retrying on ${nextPort}...`);
+        startServer(nextPort);
+      } else {
+        console.error("❌ Server Error:", err);
+      }
+    })
+    .on("listening", () => {
+      const addr = server.address();
+      console.log(`🚀 Server running on port ${addr.port}`);
+      console.log(`🔗 API Health: http://localhost:${addr.port}/api/health`);
+    });
+}
+
+startServer(INITIAL_PORT);
