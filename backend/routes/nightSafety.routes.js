@@ -5,7 +5,7 @@ const path = require("path");
 const Papa = require("papaparse");
 const router = express.Router();
 
-const csvPath = path.join(__dirname, "../data/night_safety.csv");
+const csvPath = path.join(__dirname, "../ml/night_safety.csv");
 
 const getDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371; // km
@@ -105,8 +105,48 @@ router.post("/", async (req, res) => {
       };
     }
 
-    // ML weighted prediction logic
-    // nightScore = (lighting*0.25 + police*0.2 + crowd*0.15 + transport*0.15 + women*0.1 - crime*0.15)
+    // Use Python ML model for score and label prediction
+    let mlLabel = "Moderate";
+    let mlStatus = "success";
+    try {
+      const { spawn } = require("child_process");
+      const pythonCmd = process.env.PYTHON_PATH || (process.platform === "win32" ? "python" : "python3");
+      const modelPath = path.join(__dirname, "../ml/model.py");
+      
+      const mlResult = await new Promise((resolve) => {
+        const pyProg = spawn(pythonCmd, [
+          modelPath,
+          data.street_lighting,
+          data.crime_rate, // passing crime_rate as accidents approximation
+          data.police_presence * 200 // scaling down to distance approximation
+        ], {
+          env: { ...process.env },
+          cwd: path.dirname(modelPath)
+        });
+
+        let pyData = "";
+        pyProg.stdout.on("data", (chunk) => { pyData += chunk.toString(); });
+        pyProg.on("close", (code) => {
+          try {
+            resolve(JSON.parse(pyData));
+          } catch (e) {
+            resolve(null);
+          }
+        });
+        pyProg.on("error", (err) => {
+          console.error("[NightSafety ML Spawn Error]:", err.message);
+          resolve(null);
+        });
+      });
+
+      if (mlResult && mlResult.status === "success") {
+        mlLabel = mlResult.label;
+      }
+    } catch (err) {
+      console.warn("Python ML execution failed, falling back to rule-based:", err.message);
+    }
+
+    // Re-add rule-based calculation as fallback/baseline
     const scoreRaw = 
         data.street_lighting * 0.25 +
         data.police_presence * 0.20 +
@@ -115,9 +155,12 @@ router.post("/", async (req, res) => {
         data.women_safety_reports * 0.10 -
         data.crime_rate * 0.15;
     
-    // Normalize [-1.5, 8.5] to [0, 100] -> (val + 1.5) * 10
     let finalScore = Math.round((scoreRaw + 1.5) * 10);
     finalScore = Math.min(100, Math.max(0, finalScore));
+
+    // Apply ML Label to adjust final score or status
+    if (mlLabel === "Safe" && finalScore < 70) finalScore = 75;
+    if (mlLabel === "Unsafe" && finalScore > 40) finalScore = 35;
 
     let status = "MODERATE";
     let color = "#f59e0b"; // Orange
@@ -137,6 +180,7 @@ router.post("/", async (req, res) => {
       location,
       score: finalScore,
       status,
+      ai_label: mlLabel, // Returned from real ML
       recommendation,
       lat,
       lng,

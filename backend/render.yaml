@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: greenpath-backend
+    env: docker
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MAPTILER_KEY
+        sync: false
+      - key: ORS_API_KEY
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: WAQI_API_KEY
+        sync: false

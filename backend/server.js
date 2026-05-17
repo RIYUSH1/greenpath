@@ -43,12 +43,27 @@ mongoose
 // ✅ Initialize Express + Socket.io
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const io = new Server(server, { 
+  cors: { 
+    origin: process.env.FRONTEND_URL || "*",
+    methods: ["GET", "POST"]
+  } 
+});
 
 // ✅ Middleware
 app.use(helmet());
-app.use(cors());
-app.use(morgan("dev"));
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
+}));
+
+if (process.env.NODE_ENV === "production") {
+  app.use(morgan("combined"));
+} else {
+  app.use(morgan("dev"));
+}
+
 app.use(express.json());
 
 app.use("/api/night-safety", nightSafetyRoutes);
@@ -58,6 +73,7 @@ app.use("/api/trips", tripsRoutes);
 app.use("/api/transit", transitRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/external", orsRoutes);
+app.use("/api/safety", safetyRoutes);
 
 // ✅ New Leaderboard Route
 app.use("/api/leaderboard", leaderboardRoutes);
@@ -88,19 +104,21 @@ io.on("connection", (socket) => {
 // ✅ Cron Task Example
 cron.schedule("0 7 * * *", () => console.log("⏰ Daily job executed at 07:00"));
 
-// ✅ Serve Frontend (Production Only)
-if (process.env.NODE_ENV === "production") {
+// ✅ Serve Frontend Static Files (Production Only)
+// NOTE: This is only used if frontend is co-located. On Render, frontend is on Vercel.
+// The catch-all is guarded to never intercept /api/* routes.
+if (process.env.NODE_ENV === "production" && process.env.SERVE_FRONTEND === "true") {
   app.use(express.static(path.join(__dirname, "public")));
-  app.get("*", (req, res) => {
+  app.get(/^(?!\/api).*$/, (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
   });
 }
 
-// ✅ Start Server (with Auto-Port Fallback)
-const INITIAL_PORT = process.env.PORT || 5000;
+// ✅ Start Server
+const PORT = process.env.PORT || 5000;
 
 function startServer(port) {
-  server.listen(port)
+  server.listen(port, "0.0.0.0")
     .on("error", (err) => {
       if (err.code === "EADDRINUSE") {
         const nextPort = Number(port) + 1;
@@ -112,9 +130,25 @@ function startServer(port) {
     })
     .on("listening", () => {
       const addr = server.address();
-      console.log(`🚀 Server running on port ${addr.port}`);
-      console.log(`🔗 API Health: http://localhost:${addr.port}/api/health`);
+      const host = addr.address === "0.0.0.0" ? "localhost" : addr.address;
+      console.log(`🚀 Production Server running on port ${addr.port}`);
+      console.log(`🔗 API Health: http://${host}:${addr.port}/api/health`);
     });
 }
 
-startServer(INITIAL_PORT);
+// Global Error Handlers for Production Stability
+process.on("unhandledRejection", (err) => {
+  console.error("❌ UNHANDLED REJECTION! 💥 Shutting down...");
+  console.error(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("❌ UNCAUGHT EXCEPTION! 💥 Shutting down...");
+  console.error(err.name, err.message);
+  process.exit(1);
+});
+
+startServer(PORT);

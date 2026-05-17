@@ -7,7 +7,7 @@ const router = express.Router();
 
 // ---- CSV Loading ----
 let safetyDataPoints = [];
-const csvPath = path.join(__dirname, "../../python-backend/data/night_safety_data.csv");
+const csvPath = path.join(__dirname, "../ml/night_safety.csv");
 
 const loadSafetyCSV = () => {
   try {
