@@ -1,7 +1,11 @@
 node_modules
 .env
+.env.*
 npm-debug.log
 dist
 __pycache__
 venv
 *.pyc
+*.log
+testORS.js
+.git

@@ -29,16 +29,25 @@ const safetyRoutes = require("./routes/safety");
 const routeProxyRoutes = require("./routes/route_proxy");
 const nightSafetyRoutes = require("./routes/nightSafety.routes.js");
 
-// ✅ MongoDB Connect
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/greenpath";
-mongoose.set("strictQuery", true);
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => {
-    console.error("❌ MongoDB connection error:", err);
-    process.exit(1);
-  });
+// ✅ MongoDB Connect — non-fatal: server starts regardless, retries on failure
+const MONGO_URI = process.env.MONGO_URI;
+
+if (!MONGO_URI) {
+  console.warn("⚠️  MONGO_URI not set. MongoDB features will be unavailable.");
+} else {
+  mongoose.set("strictQuery", true);
+  const connectWithRetry = () => {
+    mongoose
+      .connect(MONGO_URI)
+      .then(() => console.log("✅ MongoDB connected"))
+      .catch((err) => {
+        console.error("❌ MongoDB connection error:", err.message);
+        console.log("🔄 Retrying MongoDB connection in 5 seconds...");
+        setTimeout(connectWithRetry, 5000);
+      });
+  };
+  connectWithRetry();
+}
 
 // ✅ Initialize Express + Socket.io
 const app = express();
@@ -137,12 +146,11 @@ function startServer(port) {
 }
 
 // Global Error Handlers for Production Stability
-process.on("unhandledRejection", (err) => {
-  console.error("❌ UNHANDLED REJECTION! 💥 Shutting down...");
-  console.error(err.name, err.message);
-  server.close(() => {
-    process.exit(1);
-  });
+process.on("unhandledRejection", (reason, promise) => {
+  // Log but do NOT exit — unhandled promise rejections from API calls
+  // (ORS timeouts, MapTiler failures, etc.) should never crash the server
+  console.error("⚠️  Unhandled Rejection at:", promise);
+  console.error("Reason:", reason?.message || reason);
 });
 
 process.on("uncaughtException", (err) => {

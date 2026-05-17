@@ -2,18 +2,19 @@
 const mongoose = require("mongoose");
 
 const TripSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  origin: String,
-  destination: String,
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  from: { type: String },
+  to: { type: String },
   mode: {
     type: String,
     enum: ["bike", "walk", "car", "bus", "train", "ev"],
     default: "car",
   },
-  distance_km: Number,
-  duration_min: Number,
-  co2_saved_kg: Number, // when user chooses greener route than baseline
-  createdAt: { type: Date, default: Date.now },
+  distance: { type: Number },
+  duration_min: { type: Number },
+  co2Saved: { type: Number, default: 0 },
+  date: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model("Trip", TripSchema);
+

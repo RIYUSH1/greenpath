@@ -1,33 +1,37 @@
 FROM node:20-slim
 
-# Install Python 3, pip, and necessary build tools
+# Install Python 3, pip, and venv
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     python3-venv \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up working directory
 WORKDIR /app
 
-# Create a virtual environment for Python to avoid PEP 668 external-environment errors
+# Create Python venv (avoids PEP 668 pip errors on Debian Bookworm)
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHON_PATH="/opt/venv/bin/python"
 
-# Copy package files and install Node.js dependencies
+# Install Node dependencies first (layer cache optimization)
 COPY package*.json ./
 RUN npm install --production
 
-# Copy Python requirements and install them
+# Install Python ML dependencies
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the backend files
+# Copy ALL backend source files
 COPY . .
 
 # Expose the application port
 EXPOSE 5000
 
-# Start the server
+# Health check so Render knows when the container is ready
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:5000/api/health || exit 1
+
+# Start the Node.js server
 CMD ["node", "server.js"]
