@@ -1,8 +1,4 @@
-flask
-flask-cors
-python-dotenv
 joblib
 pandas
 numpy
 scikit-learn
-requests

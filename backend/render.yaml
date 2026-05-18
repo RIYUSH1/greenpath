@@ -2,6 +2,9 @@ services:
   - type: web
     name: greenpath-backend
     env: docker
+    # Tell Render where to find the Dockerfile and set the build context
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
     envVars:
       - key: NODE_ENV
         value: production
@@ -21,3 +24,5 @@ services:
         value: 7d
       - key: WAQI_API_KEY
         sync: false
+      - key: PYTHON_PATH
+        value: /opt/venv/bin/python
