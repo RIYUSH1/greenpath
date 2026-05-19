@@ -58,7 +58,7 @@ const AnimatedCounter = ({ value, duration = 1600 }) => {
 // ==========================================
 // SUB-COMPONENT: FUTURISTIC CIRCULAR PROGRESS
 // ==========================================
-const CircularProgress = ({ score, color, size = 96, label = "Safety" }) => {
+const CircularProgress = ({ score, color, size = 92, label = "Safety" }) => {
   const radius = (size - 10) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (score / 100) * circumference;
@@ -107,12 +107,12 @@ const CircularProgress = ({ score, color, size = 96, label = "Safety" }) => {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <div className="flex items-baseline">
-            <span className="text-xl font-black text-white tracking-tighter">
+            <span className="text-lg font-black text-white tracking-tighter">
               <AnimatedCounter value={score} />
             </span>
-            <span className="text-[7px] font-black text-slate-500 uppercase">/100</span>
+            <span className="text-[6px] font-black text-slate-500 uppercase">/100</span>
           </div>
-          <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{label}</span>
+          <span className="text-[6px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{label}</span>
         </div>
       </div>
     </div>
@@ -150,7 +150,7 @@ const SafetyRadarChart = ({ fastRoute, safeRoute }) => {
     getCrimeScore(safeRoute.metrics.crime),
     parseFloat(safeRoute.metrics.lighting) || 50,
     getCrowdScore(safeRoute.metrics.crowd),
-    getPoliceScore(safeRoute.metrics.policeDistance),
+    getPoliceScore(fastRoute.metrics.policeDistance),
     parseFloat(safeRoute.confidence) || 90
   ];
 
@@ -359,6 +359,80 @@ const ComparativeMetricRow = ({ label, icon: Icon, fastVal, safeVal, desc, isBet
         </div>
       </div>
     </div>
+  );
+};
+
+// ==========================================
+// SUB-COMPONENT: UNIFIED VERDICT CONTENT (FOR RE-USE)
+// ==========================================
+const SidebarVerdictContent = ({ fastRoute, safeRoute }) => {
+  return (
+    <>
+      {/* Dials Section */}
+      <h3 className="text-center font-black uppercase text-[9px] tracking-[0.2em] text-slate-500 border-b border-slate-855 pb-2.5">AI Safety Verdict</h3>
+      <div className="grid grid-cols-2 gap-3.5">
+        <div className="flex flex-col items-center">
+          <CircularProgress score={fastRoute.safetyScore} color="#ff0055" label="Fast Path" size={92} />
+          <p className="text-center text-[8px] font-black text-slate-500 mt-2 uppercase tracking-widest">Conf: {fastRoute.confidence || 65}%</p>
+        </div>
+        <div className="flex flex-col items-center">
+          <CircularProgress score={safeRoute.safetyScore} color="#00ff88" label="Safe Path" size={92} />
+          <p className="text-center text-[8px] font-black text-emerald-450 mt-2 uppercase tracking-widest">Conf: {safeRoute.confidence || 94}%</p>
+        </div>
+      </div>
+      
+      {/* ETA Comparison */}
+      <div className="border-t border-slate-855 pt-4.5">
+        <h4 className="text-slate-500 font-black text-[9px] uppercase tracking-[0.2em] mb-2.5">ETA Differential</h4>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-[#03050a]/40 border border-slate-855/50 p-2.5 rounded-xl text-center">
+            <span className="text-[8px] text-slate-550 font-bold uppercase tracking-wider">Fastest Path</span>
+            <p className="text-base font-black text-white mt-0.5">{fastRoute.duration} <span className="text-[8px] font-medium text-slate-400 uppercase">min</span></p>
+            <span className="text-[7px] font-black text-rose-500 uppercase tracking-widest block">Base Time</span>
+          </div>
+          <div className="bg-[#03050a]/40 border border-slate-855/50 p-2.5 rounded-xl text-center">
+            <span className="text-[8px] text-slate-550 font-bold uppercase tracking-wider">Safest Path</span>
+            <p className="text-base font-black text-emerald-455 mt-0.5">{safeRoute.duration} <span className="text-[8px] font-medium text-slate-400 uppercase">min</span></p>
+            <span className="text-[7px] font-black text-emerald-400 uppercase tracking-widest block">
+              +{safeRoute.duration - fastRoute.duration}m Offset
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* AI Quotes */}
+      <div className="bg-emerald-500/5 border border-emerald-500/10 p-3 rounded-xl flex gap-3 items-start select-none shadow-[0_0_15px_rgba(16,185,129,0.02)]">
+        <FiZap className="text-emerald-400 shrink-0 mt-0.5 animate-pulse" />
+        <div>
+          <span className="text-[8px] font-black uppercase text-emerald-400 tracking-widest">AI Highlights</span>
+          <p className="text-[9px] font-bold text-slate-350 mt-1 uppercase tracking-wide leading-relaxed">
+            CORRIDOR EVAL: Illuminating paths by {parseInt(safeRoute.metrics.lighting) - parseInt(fastRoute.metrics.lighting)}% lux, reducing threat zones by {Math.round(((safeRoute.safetyScore - fastRoute.safetyScore) / (100 - fastRoute.safetyScore)) * 100) || 0}%.
+          </p>
+        </div>
+      </div>
+
+      {/* Checklist */}
+      <div className="space-y-2.5">
+        {[
+          "92% fewer documented crime events",
+          "Illumination level lux score +40%",
+          "Constant pedestrian sidewalk coverage",
+          "Shield proximity within 500m of police posts"
+        ].map((item, idx) => (
+          <div key={idx} className="flex gap-2.5 items-start group">
+            <div className="mt-0.5 w-3.5 h-3.5 rounded bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 transition-colors duration-300">
+              <FiCheckCircle className="text-emerald-400 group-hover:text-slate-900 text-[8px] transition-colors" />
+            </div>
+            <p className="text-[9px] font-bold text-slate-400 leading-tight group-hover:text-slate-300 transition-colors">{item}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Action Button */}
+      <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 border border-emerald-500/20 shadow-lg shadow-emerald-500/10 active:scale-[0.97]">
+        <FiNavigation className="animate-pulse" /> Begin Telemetry Route
+      </button>
+    </>
   );
 };
 
@@ -622,18 +696,18 @@ export default function RouteSafety() {
         )}
       </AnimatePresence>
 
-      {/* Main Full-Bleed Map View Fold */}
+      {/* Main Full-Bleed Map View Fold (Fluid Height) */}
       <div 
         className={`${
           isFullscreenMap 
             ? "fixed inset-0 z-[100] w-screen h-screen bg-[#030509]" 
-            : "relative w-full h-[88vh] border-b border-slate-900 bg-[#030509]"
+            : "relative w-full h-[480px] sm:h-[580px] lg:h-[88vh] border-b border-slate-900 bg-[#030509]"
         } transition-all duration-500 ease-in-out overflow-hidden`}
       >
         {/* Floating Search Inputs HUD Console (Top-Left overlay over Map) */}
-        <div className="absolute top-6 left-6 z-30 glass-panel p-2 rounded-2xl flex flex-col md:flex-row gap-2.5 items-center shadow-2xl border border-slate-800/80 max-w-[90%] md:max-w-2xl">
+        <div className="absolute top-6 left-6 z-30 glass-panel p-2 rounded-2xl flex flex-col md:flex-row gap-2.5 items-center shadow-2xl border border-slate-800/80 w-[calc(100%-3rem)] md:w-auto md:max-w-2xl">
           <div className="flex items-center gap-2 bg-[#04060c]/85 px-3 py-2 rounded-xl border border-slate-900 w-full md:w-52">
-            <FiMapPin className="text-cyan-405 text-cyan-400 flex-shrink-0" />
+            <FiMapPin className="text-cyan-400 flex-shrink-0" />
             <input 
               type="text" 
               value={start} 
@@ -643,7 +717,7 @@ export default function RouteSafety() {
             />
           </div>
           <div className="flex items-center gap-2 bg-[#04060c]/85 px-3 py-2 rounded-xl border border-slate-900 w-full md:w-52">
-            <FiTarget className="text-rose-405 text-rose-450 flex-shrink-0" />
+            <FiTarget className="text-rose-450 flex-shrink-0" />
             <input 
               type="text" 
               value={destination} 
@@ -666,7 +740,7 @@ export default function RouteSafety() {
           </button>
         </div>
 
-        {/* Floating Sidebar Verdict Overlay (Right side of Map) */}
+        {/* Floating Sidebar Verdict Overlay (Right side of Map - DESKTOP ONLY `hidden lg:flex`) */}
         <AnimatePresence>
           {fastRoute && safeRoute && !isFullscreenMap && (
             <motion.div 
@@ -674,75 +748,9 @@ export default function RouteSafety() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 50 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              className="absolute top-24 right-6 z-25 w-[330px] rounded-[2rem] p-6 glass-panel border border-slate-800/80 shadow-2xl flex flex-col gap-4.5 select-none max-h-[75vh] overflow-y-auto scrollbar-hide"
+              className="hidden lg:flex absolute top-24 right-6 z-25 w-[330px] rounded-[2rem] p-6 glass-panel border border-slate-800/80 shadow-2xl flex-col gap-4.5 select-none max-h-[75vh] overflow-y-auto scrollbar-hide"
             >
-              {/* Glowing Accent */}
-              <div className="absolute right-0 top-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-
-              {/* Dials Section */}
-              <h3 className="text-center font-black uppercase text-[9px] tracking-[0.2em] text-slate-500 border-b border-slate-850 pb-2.5">AI Safety Verdict</h3>
-              <div className="grid grid-cols-2 gap-3.5">
-                <div className="flex flex-col items-center">
-                  <CircularProgress score={fastRoute.safetyScore} color="#ff0055" label="Fast Path" size={92} />
-                  <p className="text-center text-[8px] font-black text-slate-500 mt-2 uppercase tracking-widest">Conf: {fastRoute.confidence || 65}%</p>
-                </div>
-                <div className="flex flex-col items-center">
-                  <CircularProgress score={safeRoute.safetyScore} color="#00ff88" label="Safe Path" size={92} />
-                  <p className="text-center text-[8px] font-black text-emerald-450 mt-2 uppercase tracking-widest">Conf: {safeRoute.confidence || 94}%</p>
-                </div>
-              </div>
-              
-              {/* ETA Differential Grid */}
-              <div className="border-t border-slate-850 pt-4.5">
-                <h4 className="text-slate-500 font-black text-[9px] uppercase tracking-[0.2em] mb-2.5">ETA Differential</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-[#03050a]/40 border border-slate-855/50 p-2.5 rounded-xl text-center">
-                    <span className="text-[8px] text-slate-550 font-bold uppercase tracking-wider">Fastest Path</span>
-                    <p className="text-base font-black text-white mt-0.5">{fastRoute.duration} <span className="text-[8px] font-medium text-slate-400 uppercase">min</span></p>
-                    <span className="text-[7px] font-black text-rose-500 uppercase tracking-widest block">Base Time</span>
-                  </div>
-                  <div className="bg-[#03050a]/40 border border-slate-855/50 p-2.5 rounded-xl text-center">
-                    <span className="text-[8px] text-slate-550 font-bold uppercase tracking-wider">Safest Path</span>
-                    <p className="text-base font-black text-emerald-455 mt-0.5">{safeRoute.duration} <span className="text-[8px] font-medium text-slate-400 uppercase">min</span></p>
-                    <span className="text-[7px] font-black text-emerald-400 uppercase tracking-widest block">
-                      +{safeRoute.duration - fastRoute.duration}m Offset
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* AI Insights Card */}
-              <div className="bg-emerald-500/5 border border-emerald-500/10 p-3 rounded-xl flex gap-3 items-start select-none shadow-[0_0_15px_rgba(16,185,129,0.02)]">
-                <FiZap className="text-emerald-400 shrink-0 mt-0.5 animate-pulse" />
-                <div>
-                  <span className="text-[8px] font-black uppercase text-emerald-400 tracking-widest">AI Highlights</span>
-                  <p className="text-[9px] font-bold text-slate-350 mt-1 uppercase tracking-wide leading-relaxed">
-                    CORRIDOR EVAL: Illuminating paths by {parseInt(safeRoute.metrics.lighting) - parseInt(fastRoute.metrics.lighting)}% lux, reducing threat zones by {Math.round(((safeRoute.safetyScore - fastRoute.safetyScore) / (100 - fastRoute.safetyScore)) * 100) || 0}%.
-                  </p>
-                </div>
-              </div>
-
-              {/* Telemetry Highlights */}
-              <div className="space-y-2.5">
-                {[
-                  "92% fewer documented crime events",
-                  "Illumination level lux score +40%",
-                  "Constant pedestrian sidewalk coverage",
-                  "Shield proximity within 500m of police posts"
-                ].map((item, idx) => (
-                  <div key={idx} className="flex gap-2.5 items-start group">
-                    <div className="mt-0.5 w-3.5 h-3.5 rounded bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 transition-colors duration-300">
-                      <FiCheckCircle className="text-emerald-400 group-hover:text-slate-900 text-[8px] transition-colors" />
-                    </div>
-                    <p className="text-[9px] font-bold text-slate-400 leading-tight group-hover:text-slate-300 transition-colors">{item}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Navigation button */}
-              <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 border border-emerald-500/20 shadow-lg shadow-emerald-500/10 active:scale-[0.97]">
-                <FiNavigation className="animate-pulse" /> Begin Telemetry Route
-              </button>
+              <SidebarVerdictContent fastRoute={fastRoute} safeRoute={safeRoute} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -768,7 +776,7 @@ export default function RouteSafety() {
 
       {/* Spacious Lower fold (Hidden in Fullscreen Immersive Mode) */}
       {!isFullscreenMap && (
-        <div className="w-full px-8 py-16 space-y-16 border-t border-slate-900 bg-[#030509] relative z-10">
+        <div className="w-full px-6 md:px-12 xl:px-24 py-12 md:py-16 space-y-12 md:space-y-16 border-t border-slate-900 bg-[#030509] relative z-10">
           
           {/* Geolocation status warning feedback (only active during locating) */}
           {locationLoading && (
@@ -782,13 +790,24 @@ export default function RouteSafety() {
             </motion.div>
           )}
 
+          {/* MOBILE/TABLET STACKED VERDICT PANEL (Visible only below `lg` breakpoint) */}
+          <AnimatePresence>
+            {fastRoute && safeRoute && (
+              <div className="block lg:hidden w-full">
+                <div className="glass-panel rounded-[2rem] p-6 border border-slate-800/80 shadow-2xl flex flex-col gap-4.5 select-none w-full max-w-2xl mx-auto">
+                  <SidebarVerdictContent fastRoute={fastRoute} safeRoute={safeRoute} />
+                </div>
+              </div>
+            )}
+          </AnimatePresence>
+
           {/* Deep Comparative Analysis metrics cards & radar */}
           <AnimatePresence>
             {fastRoute && safeRoute && (
               <motion.div 
                 initial={{ opacity: 0, y: 24 }} 
                 animate={{ opacity: 1, y: 0 }} 
-                className="glass-panel rounded-[2.5rem] p-10 border border-slate-800/80 shadow-2xl relative overflow-hidden"
+                className="glass-panel rounded-[2.5rem] p-6 sm:p-10 border border-slate-800/80 shadow-2xl relative overflow-hidden"
               >
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 select-none">
                   <div>

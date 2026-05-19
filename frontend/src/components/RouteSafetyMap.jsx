@@ -988,7 +988,7 @@ const RouteSafetyMap = ({
       )}
 
       {/* Floating map toggles (Heatmap and Cityscapes) */}
-      <div className="absolute top-[72px] left-6 z-20 flex flex-col gap-2">
+      <div className="absolute top-[180px] md:top-[72px] left-6 z-20 flex flex-col gap-2">
         <button 
           onClick={() => setShowHeatmap(!showHeatmap)} 
           className={`px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider border transition-all flex items-center gap-2 ${
@@ -1017,7 +1017,7 @@ const RouteSafetyMap = ({
       {/* Locate Me */}
       <button 
         onClick={onLocateMe}
-        className="absolute bottom-6 left-6 z-20 w-10 h-10 bg-slate-950/70 border border-slate-800 rounded-xl shadow-2xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-900 transition-all group"
+        className="absolute bottom-40 right-6 md:bottom-6 md:left-6 md:right-auto z-20 w-10 h-10 bg-slate-950/70 border border-slate-800 rounded-xl shadow-2xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-900 transition-all group"
         title="Lock Current Coordinates"
       >
         <FiNavigation className="text-base group-hover:scale-105 transition-transform" />
@@ -1025,7 +1025,7 @@ const RouteSafetyMap = ({
 
       {/* Telemetry Progress / Simulation Bar */}
       {showRoutes && routes.length > 0 && (
-        <div className="absolute bottom-6 left-20 z-20 glass-panel p-3.5 rounded-2xl flex items-center gap-4 border border-slate-800 shadow-2xl max-w-[90%] md:max-w-md animate-fade-in text-white text-xs select-none">
+        <div className="absolute bottom-24 left-6 right-6 md:bottom-6 md:left-20 md:right-auto z-20 glass-panel p-3.5 rounded-2xl flex flex-col md:flex-row items-stretch md:items-center gap-4 border border-slate-800 shadow-2xl max-w-[calc(100%-3rem)] md:max-w-md animate-fade-in text-white text-xs select-none">
           <div className="flex flex-col gap-1 border-r border-slate-800 pr-3.5">
             <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Navigation Simulation</span>
             <div className="flex gap-1.5 mt-1">
@@ -1109,27 +1109,29 @@ const RouteSafetyMap = ({
 
       {/* Premium Sleek Bottom-Right Comparison Console Overlay */}
       {showRoutes && routes.length > 0 && (
-        <div className="absolute bottom-6 right-6 z-20 glass-panel p-3.5 rounded-2xl flex items-center gap-3.5 border border-slate-800 shadow-2xl animate-fade-in text-white text-xs select-none max-w-[90%] md:max-w-sm">
+        <div className="absolute bottom-6 left-6 right-6 md:left-auto md:right-6 md:bottom-6 z-20 glass-panel p-3 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center gap-3 border border-slate-800 shadow-2xl animate-fade-in text-white text-xs select-none max-w-[calc(100%-3rem)] md:max-w-sm">
           {routes.map((route) => {
             const isSafe = route.id === 'safe';
             return (
               <div 
                 key={route.id} 
-                className={`flex items-center gap-3 bg-[#03050a]/40 p-2 rounded-xl border transition-all ${
+                className={`flex items-center justify-between gap-3 bg-[#03050a]/40 p-2 rounded-xl border transition-all flex-1 ${
                   isSafe ? 'border-emerald-500/10' : 'border-red-500/10'
                 }`}
               >
-                {/* Status indicator color dot */}
-                <div 
-                  className="w-2 h-2 rounded-full shadow-[0_0_6px_currentColor] shrink-0" 
-                  style={{ color: route.color }}
-                />
-                
-                <div className="flex flex-col">
-                  <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">{route.label}</span>
-                  <span className="text-[10px] font-black text-white mt-0.5 whitespace-nowrap">
-                    {route.duration}m <span className="text-slate-650 font-bold">•</span> {route.distance}km
-                  </span>
+                <div className="flex items-center gap-2">
+                  {/* Status indicator color dot */}
+                  <div 
+                    className="w-2 h-2 rounded-full shadow-[0_0_6px_currentColor] shrink-0" 
+                    style={{ color: route.color }}
+                  />
+                  
+                  <div className="flex flex-col">
+                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">{route.label}</span>
+                    <span className="text-[10px] font-black text-white mt-0.5 whitespace-nowrap">
+                      {route.duration}m <span className="text-slate-650 font-bold">•</span> {route.distance}km
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex flex-col text-right pl-2.5 border-l border-slate-850 shrink-0">

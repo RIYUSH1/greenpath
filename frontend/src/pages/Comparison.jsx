@@ -356,16 +356,16 @@ export default function Comparison() {
   };
 
   return (
-    <div className="w-full bg-[#F8FAFC] min-h-screen text-[#0F172A] py-16">
+    <div className="w-full bg-[#F8FAFC] min-h-screen text-[#0F172A] py-12 md:py-24">
       {loading && <LoadingOverlay message={showWakingMessage ? "Waking Servers..." : "Analyzing Routes..."} showWakingMessage={showWakingMessage} />}
       
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
+      <div className="max-w-[1550px] mx-auto px-6 md:px-12 xl:px-24">
         {/* Header */}
-        <div className="mb-16">
-          <h1 className="text-4xl md:text-5xl font-black mb-4 text-[#0F172A]">
+        <div className="mb-12 md:mb-16">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-4 text-[#0F172A] tracking-tight">
             Route & <span className="text-[#16A34A]">Eco Comparison</span>
           </h1>
-          <p className="text-[#475569] text-xl font-medium max-w-2xl">
+          <p className="text-[#475569] text-lg sm:text-xl font-medium max-w-2xl">
             Real-time insights for CO₂, AQI, traffic & predictive safety. Compare and choose the greenest path.
           </p>
         </div>
@@ -373,11 +373,11 @@ export default function Comparison() {
         <EcoPreferenceSelector onChange={setEcoPrefs} />
 
         {/* Comparison Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 mb-16 items-start">
           
           {/* Left Panel: Inputs */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="p-8 bg-white rounded-3xl border border-gray-100 shadow-sm">
+            <div className="p-6 sm:p-8 bg-white rounded-3xl border border-gray-100 shadow-sm">
               <h3 className="text-lg font-black mb-6 uppercase tracking-wider text-[#0F172A]">Journey Details</h3>
               
               <div className="space-y-6">
@@ -443,7 +443,7 @@ export default function Comparison() {
           <div className="lg:col-span-8 space-y-8">
             
             {/* Map Preview */}
-            <div className="bg-white p-4 rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden h-[400px]">
+            <div className="bg-white p-4 rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden h-[350px] sm:h-[450px] lg:h-[550px]">
               <div ref={mapRef} className="w-full h-full rounded-[2rem] bg-gray-50 flex items-center justify-center text-gray-400">
                 {!results && <p className="font-bold flex items-center gap-2"><FaMapMarkedAlt /> Map Preview will appear here</p>}
               </div>
@@ -516,13 +516,13 @@ export default function Comparison() {
         </div>
 
         {/* Global Impact & Leaderboard */}
-        <section className="bg-white py-20 rounded-[3rem] border border-gray-100 shadow-sm px-8 md:px-16">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+        <section className="bg-white py-16 md:py-20 rounded-[3rem] border border-gray-100 shadow-sm px-6 sm:px-12 lg:px-16">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-16 gap-8">
             <div>
                <h2 className="text-4xl md:text-5xl font-black mb-6 text-[#0F172A]">Community <span className="text-[#16A34A]">Heroes</span></h2>
                <p className="text-[#475569] text-xl font-medium max-w-xl">Every kilogram of CO₂ saved contributes to our global leaderboard. Join the movement.</p>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-6 select-none shrink-0">
               <div className="text-center">
                  <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 font-black">Total Trees</p>
                  <p className="text-3xl font-black text-[#16A34A]">1,248</p>
@@ -535,9 +535,9 @@ export default function Comparison() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {leaderboard.slice(0, 4).map((entry, idx) => (
-              <div key={idx} className="p-8 bg-gray-50 rounded-3xl border border-gray-100 text-center hover:scale-105 transition-all group">
+              <div key={idx} className="p-8 bg-gray-50 rounded-3xl border border-gray-100 text-center hover:scale-[1.03] transition-all duration-300 group">
                 <div className="text-5xl mb-6">{idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : "🎖️"}</div>
                 <h4 className="text-xl font-black text-[#0F172A] mb-2">{entry.name || entry.user?.name || "Eco Hero"}</h4>
                 <p className="text-green-600 font-bold text-sm mb-4">{Number(entry.ecoPoints || entry.points || 0).toFixed(0)} Points</p>
