@@ -37,28 +37,50 @@ const EMISSION_FACTORS = {
 /* =====================================================
    HELPERS
    ===================================================== */
-const normalizePlace = (place) =>
-  place.toLowerCase().includes("india") ? place : `${place}, India`;
-
 const geocodePlace = async (place) => {
-  const r = await axios.get(
-    "https://api.openrouteservice.org/geocode/search",
-    {
-      params: { 
-        text: place, 
-        size: 1,
-        api_key: ORS_API_KEY
-      },
-      headers: { Authorization: ORS_API_KEY },
-      timeout: 10000,
+  try {
+    // Try dynamic geocoding exactly as entered by the user
+    let r = await axios.get(
+      "https://api.openrouteservice.org/geocode/search",
+      {
+        params: { 
+          text: place, 
+          size: 1,
+          api_key: ORS_API_KEY
+        },
+        headers: { Authorization: ORS_API_KEY },
+        timeout: 10000,
+      }
+    );
+
+    let features = r?.data?.features;
+    if (features && features.length > 0) {
+      return features[0].geometry.coordinates;
     }
-  );
 
-  const features = r?.data?.features;
-  if (!features || features.length === 0) return null;
-
-  // ORS format: [lng, lat]
-  return features[0].geometry.coordinates;
+    // Try India fallback only if not found globally and search does not already contain "india"
+    if (!place.toLowerCase().includes("india")) {
+      r = await axios.get(
+        "https://api.openrouteservice.org/geocode/search",
+        {
+          params: { 
+            text: `${place}, India`, 
+            size: 1,
+            api_key: ORS_API_KEY
+          },
+          headers: { Authorization: ORS_API_KEY },
+          timeout: 10000,
+        }
+      );
+      features = r?.data?.features;
+      if (features && features.length > 0) {
+        return features[0].geometry.coordinates;
+      }
+    }
+  } catch (err) {
+    console.error("Geocoding failed for:", place, err.message);
+  }
+  return null;
 };
 
 /* =====================================================
@@ -88,10 +110,8 @@ router.post("/ors-route", async (req, res) => {
     }
 
     // ---- Geocoding ----
-    const originCoords = await geocodePlace(normalizePlace(origin));
-    const destinationCoords = await geocodePlace(
-      normalizePlace(destination)
-    );
+    const originCoords = await geocodePlace(origin);
+    const destinationCoords = await geocodePlace(destination);
 
     if (!originCoords || !destinationCoords) {
       return res.status(400).json({

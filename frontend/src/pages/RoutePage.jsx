@@ -87,6 +87,9 @@ export default function RoutePage() {
   // STATE MANAGEMENT
   // =====================================================
   const [place, setPlace] = useState("");
+  const [startPlace, setStartPlace] = useState("");
+  const [startCoords, setStartCoords] = useState([77.2090, 28.6139]); // Delhi default
+  const [locationLoading, setLocationLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(true);
   const [showResult, setShowResult] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -110,6 +113,78 @@ export default function RoutePage() {
     lat: 12.9716,
     lng: 77.5946, // Bangalore
   });
+
+  const MAP_KEY = import.meta.env.VITE_MAPTILER_KEY;
+  const isValidKey = (key) => key && key !== "your_key_here" && !key.includes("token");
+
+  // Geocoding and reverse geocoding helpers
+  const reverseGeocode = async (lng, lat) => {
+    if (isValidKey(MAP_KEY)) {
+      try {
+        const resp = await axios.get(`https://api.maptiler.com/geocoding/${lng},${lat}.json?key=${MAP_KEY}`);
+        if (resp.data.features && resp.data.features.length > 0) {
+          return resp.data.features[0].place_name;
+        }
+      } catch (err) {
+        console.warn("Reverse geocoding MapTiler failed, trying Nominatim fallback:", err.message);
+      }
+    }
+    
+    try {
+      const resp = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lon=${lng}&lat=${lat}`, {
+        headers: { "User-Agent": "GreenPath/1.0" }
+      });
+      if (resp.data && resp.data.display_name) {
+        return resp.data.display_name;
+      }
+    } catch (osmErr) {
+      console.error("Nominatim reverse geocode fallback failed:", osmErr.message);
+    }
+    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  };
+
+  const geocode = async (query) => {
+    if (isValidKey(MAP_KEY)) {
+      try {
+        const resp = await axios.get(`https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json?key=${MAP_KEY}`);
+        if (resp.data.features && resp.data.features.length > 0) {
+          return resp.data.features[0].geometry.coordinates;
+        }
+      } catch (err) {
+        console.warn(`[Geocode] MapTiler failed for "${query}", trying fallback...`);
+      }
+    }
+
+    try {
+      const fall = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`, {
+        headers: { "User-Agent": "GreenPath/1.0" }
+      });
+      if (fall.data && fall.data.length > 0) {
+        return [parseFloat(fall.data[0].lon), parseFloat(fall.data[0].lat)];
+      }
+    } catch (fErr) {
+      console.error("OSM Geocoding fallback failed:", fErr);
+    }
+    throw new Error(`Location not found: ${query}`);
+  };
+
+  // Detect Live Position on mount to automatically prepopulate origin
+  useEffect(() => {
+    if (navigator.geolocation) {
+      setLocationLoading(true);
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          setStartCoords([longitude, latitude]);
+          const name = await reverseGeocode(longitude, latitude);
+          setStartPlace(name);
+          setLocationLoading(false);
+        },
+        () => setLocationLoading(false),
+        { enableHighAccuracy: true }
+      );
+    }
+  }, []);
 
   // =====================================================
   // AI POPUP ON PAGE LOAD
@@ -162,6 +237,16 @@ export default function RoutePage() {
     }, 100);
 
     try {
+      // Geocode start place dynamically if provided
+      if (startPlace.trim()) {
+        try {
+          const sCoords = await geocode(startPlace);
+          setStartCoords(sCoords);
+        } catch (err) {
+          console.warn("Could not geocode origin, using fallback/previous:", err.message);
+        }
+      }
+
       // Calling our newly trained AI predictive model on the backend
       const response = await axios.post(`${API_BASE_URL}/api/safety/predict`, { location: place });
       const data = response.data;
@@ -349,6 +434,34 @@ export default function RoutePage() {
             transition={{ repeat: Infinity, duration: 3 }}
             className="inline-block"
           >
+            <FaMapMarkerAlt className="inline mr-2 text-[#38bdf8]" />
+          </motion.span>
+          Enter Trip Origin
+        </label>
+
+        <input
+          type="text"
+          value={startPlace}
+          onChange={(e) => setStartPlace(e.target.value)}
+          placeholder={locationLoading ? "Detecting your current location..." : "e.g., Indira Gandhi International Airport, Delhi"}
+          className="w-full px-5 py-4 mb-6 rounded-xl bg-[#0f172a]/70 text-white placeholder-gray-500 transition-all duration-300 focus:outline-none"
+          style={{ border: "1px solid rgba(255, 255, 255, 0.1)" }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = "#38bdf8";
+            e.currentTarget.style.boxShadow = "0 0 20px rgba(56,189,248,0.3)";
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)";
+            e.currentTarget.style.boxShadow = "none";
+          }}
+        />
+
+        <label className="block mb-4 text-lg font-bold tracking-wide text-white/90">
+          <motion.span
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ repeat: Infinity, duration: 3 }}
+            className="inline-block"
+          >
             <FaMapMarkerAlt className="inline mr-2 text-[#a78bfa]" />
           </motion.span>
           Enter Trip Destination
@@ -438,8 +551,11 @@ export default function RoutePage() {
             <FaMapMarkerAlt /> {showResult ? "Safe Route Comparison Engine" : "Real-time Location Preview"}
           </h3>
           <RouteSafetyMap 
+            startCoords={startCoords}
             destination={{ lat: routeLocation.lat, lng: routeLocation.lng }} 
             showRoutes={showResult}
+            startName={startPlace || "Origin"}
+            destName={place || "Destination"}
           />
         </div>
       </motion.div>

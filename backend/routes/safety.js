@@ -11,15 +11,36 @@ router.post("/predict", async (req, res) => {
 
     // 1. Geocode the location
     const ORS_API_KEY = process.env.ORS_API_KEY;
-    const normalizePlace = (place) => place.toLowerCase().includes("india") ? place : `${place}, India`;
     
-    const r = await axios.get("https://api.openrouteservice.org/geocode/search", {
-      params: { text: normalizePlace(location), size: 1 },
-      headers: { Authorization: ORS_API_KEY },
-      timeout: 8000,
-    });
+    let r;
+    let features;
+    
+    try {
+      // Try raw location globally first
+      r = await axios.get("https://api.openrouteservice.org/geocode/search", {
+        params: { text: location, size: 1 },
+        headers: { Authorization: ORS_API_KEY },
+        timeout: 8000,
+      });
+      features = r?.data?.features;
+    } catch (err) {
+      console.warn("Global geocode failed, trying fallback...", err.message);
+    }
 
-    const features = r?.data?.features;
+    // Try India fallback only if global search yielded no results and query doesn't contain "india"
+    if ((!features || features.length === 0) && !location.toLowerCase().includes("india")) {
+      try {
+        r = await axios.get("https://api.openrouteservice.org/geocode/search", {
+          params: { text: `${location}, India`, size: 1 },
+          headers: { Authorization: ORS_API_KEY },
+          timeout: 8000,
+        });
+        features = r?.data?.features;
+      } catch (err) {
+        console.error("India fallback geocode failed:", err.message);
+      }
+    }
+
     if (!features || features.length === 0) {
       return res.status(404).json({ error: "Location not found" });
     }
