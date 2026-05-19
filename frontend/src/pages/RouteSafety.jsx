@@ -108,13 +108,26 @@ export default function RouteSafety() {
   }, []);
 
   const reverseGeocode = async (lng, lat) => {
-    try {
-      const resp = await axios.get(`https://api.maptiler.com/geocoding/${lng},${lat}.json?key=${MAP_KEY}`);
-      if (resp.data.features && resp.data.features.length > 0) {
-        return resp.data.features[0].place_name;
+    if (isValidKey(MAP_KEY)) {
+      try {
+        const resp = await axios.get(`https://api.maptiler.com/geocoding/${lng},${lat}.json?key=${MAP_KEY}`);
+        if (resp.data.features && resp.data.features.length > 0) {
+          return resp.data.features[0].place_name;
+        }
+      } catch (err) {
+        console.warn("Reverse geocoding MapTiler failed, trying Nominatim fallback:", err.message);
       }
-    } catch (err) {
-      console.warn("Reverse geocoding failed:", err);
+    }
+    
+    try {
+      const resp = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lon=${lng}&lat=${lat}`, {
+        headers: { "User-Agent": "GreenPath/1.0" }
+      });
+      if (resp.data && resp.data.display_name) {
+        return resp.data.display_name;
+      }
+    } catch (osmErr) {
+      console.error("Nominatim reverse geocode fallback failed:", osmErr.message);
     }
     return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
   };
@@ -160,22 +173,26 @@ export default function RouteSafety() {
   // Local state for dual routes (Step 6)
 
   const geocode = async (query) => {
-    try {
-      const resp = await axios.get(`https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json?key=${MAP_KEY}`);
-      if (resp.data.features && resp.data.features.length > 0) {
-        return resp.data.features[0].geometry.coordinates;
-      }
-      throw new Error("Not found");
-    } catch (err) {
-      console.warn(`[Geocode] MapTiler failed for "${query}", trying fallback...`);
+    if (isValidKey(MAP_KEY)) {
       try {
-        const fall = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
-        if (fall.data && fall.data.length > 0) {
-          return [parseFloat(fall.data[0].lon), parseFloat(fall.data[0].lat)];
+        const resp = await axios.get(`https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json?key=${MAP_KEY}`);
+        if (resp.data.features && resp.data.features.length > 0) {
+          return resp.data.features[0].geometry.coordinates;
         }
-      } catch (fErr) { console.error("Fallback failed:", fErr); }
-      throw new Error(`Location not found: ${query}`);
+      } catch (err) {
+        console.warn(`[Geocode] MapTiler failed for "${query}", trying fallback...`);
+      }
     }
+
+    try {
+      const fall = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+      if (fall.data && fall.data.length > 0) {
+        return [parseFloat(fall.data[0].lon), parseFloat(fall.data[0].lat)];
+      }
+    } catch (fErr) {
+      console.error("OSM Geocoding fallback failed:", fErr);
+    }
+    throw new Error(`Location not found: ${query}`);
   };
 
   // Safe Route generation moved to Backend (Step 4-5)

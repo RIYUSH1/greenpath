@@ -122,14 +122,16 @@ const RouteSafetyMap = ({ startCoords = [77.209, 28.6139], destination, showRout
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
-    if (!isValidKey(MAP_KEY)) {
-      console.error("MapTiler key is missing or invalid in .env");
-      return;
+    const fallbackStyle = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+    const mTileStyle = isValidKey(MAP_KEY) 
+      ? `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${MAP_KEY}`
+      : fallbackStyle;
+      
+    if (!isValidKey(MAP_KEY) && !styleError) {
+      setStyleError(true);
     }
 
-    const mTileStyle = `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${MAP_KEY}`;
-    const fallbackStyle = "https://demotiles.maplibre.org/style.json";
-    const initialStyle = !styleError ? mTileStyle : fallbackStyle;
+    const initialStyle = (!styleError && isValidKey(MAP_KEY)) ? mTileStyle : fallbackStyle;
 
     try {
       map.current = new maplibregl.Map({
@@ -616,15 +618,7 @@ const RouteSafetyMap = ({ startCoords = [77.209, 28.6139], destination, showRout
     }
   }, [destination, showRoutes, mapLoaded]);
 
-  if (!isValidKey(MAP_KEY)) {
-    return (
-      <div className="w-full h-[600px] bg-slate-900 border-2 border-red-500/30 rounded-3xl flex flex-col items-center justify-center p-8 text-center glass-panel">
-        <FiAlertTriangle className="text-red-500 text-6xl mb-4 animate-pulse" />
-        <h3 className="text-red-400 text-xl font-bold mb-2">Neural Link Disconnected</h3>
-        <p className="text-slate-400 max-w-md">Please check your <code>.env</code> configuration. Ensure <code>VITE_MAPTILER_KEY</code> is set with a valid token.</p>
-      </div>
-    );
-  }
+
 
   return (
     <motion.div 
@@ -700,8 +694,8 @@ const RouteSafetyMap = ({ startCoords = [77.209, 28.6139], destination, showRout
       
       {/* Engine Status Panel */}
       <div className="absolute top-6 left-6 z-20 glass-panel px-5 py-3 rounded-2xl text-xs font-black text-slate-300 uppercase tracking-widest flex items-center gap-3">
-        <div className={`w-2 h-2 rounded-full ${styleError ? 'bg-red-500' : 'bg-cyan-500'} animate-pulse`}></div>
-        {styleError ? "Engine Offline" : "Neural Route Engine V2"}
+        <div className={`w-2 h-2 rounded-full ${styleError ? 'bg-amber-500' : 'bg-cyan-500'} animate-pulse`}></div>
+        {styleError ? "Neural Engine V2 (Basemap Fallback)" : "Neural Route Engine V2"}
       </div>
 
       {/* Floating Route Cards */}
