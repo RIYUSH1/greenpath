@@ -248,7 +248,7 @@ const RouteSafetyMap = ({ startCoords = [77.209, 28.6139], destination, showRout
     setError(null);
     try {
       const coords = [start, end];
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const apiUrl = import.meta.env.VITE_API_URL || "https://greenpath-3.onrender.com";
       
       const response = await axios.post(`${apiUrl}/api/route`, {
         coordinates: coords,

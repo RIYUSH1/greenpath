@@ -13,7 +13,7 @@ import RouteSafetyMap from "../components/RouteSafetyMap"; // Import upgraded ma
 import NightSafetyAnalyzer from "../components/NightSafetyAnalyzer";
 
 const MAP_KEY = import.meta.env.VITE_MAPTILER_KEY;
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "https://greenpath-3.onrender.com";
 
 const isValidKey = (key) => key && key !== "your_key_here" && !key.includes("token");
 

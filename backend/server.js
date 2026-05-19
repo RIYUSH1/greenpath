@@ -35,17 +35,31 @@ if (!MONGO_URI) {
   mongoose.set("strictQuery", true);
 
   const connectWithRetry = () => {
-    mongoose
-      .connect(MONGO_URI, {
-        serverSelectionTimeoutMS: 10000, // give Atlas 10 s to respond
-        socketTimeoutMS: 45000,
-      })
-      .then(() => console.log("✅ MongoDB connected"))
-      .catch((err) => {
-        console.error("❌ MongoDB connection error:", err.message);
-        console.log("🔄 Retrying MongoDB connection in 5 seconds…");
-        setTimeout(connectWithRetry, 5000);
-      });
+    const trimmedUri = MONGO_URI.trim();
+    if (!trimmedUri.startsWith("mongodb://") && !trimmedUri.startsWith("mongodb+srv://")) {
+      console.error("❌ MongoDB connection error: Invalid scheme, expected connection string to start with: mongodb:// or mongodb+srv://");
+      console.log("🔄 Retrying MongoDB connection in 10 seconds…");
+      setTimeout(connectWithRetry, 10000);
+      return;
+    }
+
+    try {
+      mongoose
+        .connect(trimmedUri, {
+          serverSelectionTimeoutMS: 10000, // give Atlas 10 s to respond
+          socketTimeoutMS: 45000,
+        })
+        .then(() => console.log("✅ MongoDB connected"))
+        .catch((err) => {
+          console.error("❌ MongoDB connection error:", err.message);
+          console.log("🔄 Retrying MongoDB connection in 5 seconds…");
+          setTimeout(connectWithRetry, 5000);
+        });
+    } catch (err) {
+      console.error("❌ MongoDB connection error (synchronous exception):", err.message);
+      console.log("🔄 Retrying MongoDB connection in 5 seconds…");
+      setTimeout(connectWithRetry, 5000);
+    }
   };
 
   connectWithRetry();

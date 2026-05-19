@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiMoon, FiShield, FiAlertTriangle, FiSearch, FiZap, FiActivity, FiEye, FiNavigation, FiInfo } from "react-icons/fi";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "https://greenpath-3.onrender.com";
 
 const NightSafetyAnalyzer = ({ onAnalyze }) => {
   const [location, setLocation] = useState("");
