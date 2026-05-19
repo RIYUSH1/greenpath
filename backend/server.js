@@ -65,15 +65,38 @@ if (!MONGO_URI) {
   connectWithRetry();
 }
 
+// ── CORS Configuration ────────────────────────────────────────────────────────
+// Production-safe dynamic CORS configuration supporting:
+// - All Vercel deployment domains (including custom subdomains)
+// - Localhost development on any port
+// - Explicit allowed FRONTEND_URL from environment variables
+const corsOriginCheck = (origin, callback) => {
+  // Allow requests with no origin (like mobile apps, curl, postman)
+  if (!origin) return callback(null, true);
+
+  const isLocalhost = /^https?:\/\/localhost(:\d+)?$/.test(origin) || /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(origin);
+  const isVercel = /^https?:\/\/.*\.vercel\.app$/.test(origin);
+
+  let isCustomAllowed = false;
+  if (process.env.FRONTEND_URL) {
+    const customOrigins = process.env.FRONTEND_URL.split(",").map(o => o.trim().toLowerCase());
+    isCustomAllowed = customOrigins.includes(origin.toLowerCase());
+  }
+
+  if (isLocalhost || isVercel || isCustomAllowed) {
+    callback(null, true);
+  } else {
+    console.warn(`🔒 CORS blocked origin: ${origin}`);
+    callback(null, false);
+  }
+};
+
 // ── Express + Socket.IO ───────────────────────────────────────────────────────
 const app    = express();
 const server = http.createServer(app);
 const io     = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:5173",
-      "https://greenpath-rabj.vercel.app"
-    ],
+    origin: corsOriginCheck,
     methods: ["GET", "POST"],
     credentials: true
   },
@@ -83,10 +106,7 @@ const io     = new Server(server, {
 app.use(helmet());
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://greenpath-rabj.vercel.app"
-    ],
+    origin: corsOriginCheck,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true
   })
